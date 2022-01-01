@@ -1,7 +1,9 @@
-import 'package:blitter_flutter_app/modules/auth/widgets/avatar.dart';
-import 'package:blitter_flutter_app/widgets/gradient_button.dart';
-import 'package:blitter_flutter_app/widgets/translucent_text_form_field_container.dart';
 import 'package:flutter/material.dart';
+
+import '../../auth/widgets/avatar.dart';
+import '../../home/screens/dashboard_screen.dart';
+import '../../../widgets/gradient_button.dart';
+import '../../../widgets/translucent_text_form_field_container.dart';
 
 class UpdateProfileForm extends StatefulWidget {
   const UpdateProfileForm({Key? key}) : super(key: key);
@@ -88,7 +90,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
             GradientButton(
               title: ' Submit ',
               onPressed: () {
-                Navigator.of(context).popAndPushNamed('/dashboard');
+                Navigator.of(context).popAndPushNamed(DashboardScreen.route);
               },
             ),
           ],
