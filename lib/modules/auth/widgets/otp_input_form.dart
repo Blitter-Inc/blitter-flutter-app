@@ -107,7 +107,7 @@ class _OTPInputFormState extends State<OTPInputForm>
             onPressed: () {
               String otp = pinEditingControllers.map((e) => e.text).join();
               print(otp);
-              // animateOut();
+              animateOut();
               widget.onSubmit();
             },
           ),
