@@ -1,14 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../constants/animation.dart';
-import '../../../widgets/translucent_text_form_field_container.dart';
-import '../../../widgets/gradient_button.dart';
+import 'package:blitter_flutter_app/config/animation.dart';
+import 'package:blitter_flutter_app/data/cubits/cubits.dart';
+import 'package:blitter_flutter_app/widgets/widgets.dart';
 
 class PhoneInputForm extends StatefulWidget {
-  final VoidCallback onSubmit;
+  final AsyncCallback animateOutForm;
+
   const PhoneInputForm({
     Key? key,
-    required this.onSubmit,
+    required this.animateOutForm,
   }) : super(key: key);
 
   @override
@@ -62,7 +65,7 @@ class _PhoneInputFormState extends State<PhoneInputForm>
     super.dispose();
   }
 
-  void animateOut() {
+  void _animateOut() {
     _fieldController.reverse();
     _buttonController.reverse();
   }
@@ -94,8 +97,11 @@ class _PhoneInputFormState extends State<PhoneInputForm>
             child: GradientButton(
               title: 'Continue >',
               onPressed: () {
-                animateOut();
-                widget.onSubmit();
+                _animateOut();
+                final cubit = context.read<SigninCubit>();
+                cubit.setPhoneNumber(_phoneNumberController.text);
+                widget.animateOutForm();
+                cubit.sendOTP();
               },
             ),
           ),
