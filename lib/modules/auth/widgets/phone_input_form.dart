@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/config/animation.dart';
@@ -25,7 +26,9 @@ class _PhoneInputFormState extends State<PhoneInputForm>
   late Animation<Offset> _fieldOffset;
   late Animation<Offset> _buttonOffset;
 
+  final _form = GlobalKey<FormState>();
   final _phoneNumberController = TextEditingController();
+  double phoneFieldPaddingVertical = 0;
 
   @override
   void initState() {
@@ -70,16 +73,33 @@ class _PhoneInputFormState extends State<PhoneInputForm>
     _buttonController.reverse();
   }
 
+  void _enablePaddingForErrorText() async {
+    const double padding = 8;
+    if (phoneFieldPaddingVertical != padding) {
+      setState(() {
+        phoneFieldPaddingVertical = padding;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _form,
       child: Column(
         children: [
           SlideTransition(
             position: _fieldOffset,
             child: TranslucentTextFormFieldContainer(
+              paddingVertical: phoneFieldPaddingVertical,
               child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.length != 10 || value[0] == '0') {
+                    return 'Provide a valid phone number';
+                  }
+                },
                 controller: _phoneNumberController,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 maxLength: 10,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
@@ -97,11 +117,15 @@ class _PhoneInputFormState extends State<PhoneInputForm>
             child: GradientButton(
               title: 'Continue >',
               onPressed: () {
-                _animateOut();
-                final cubit = context.read<SigninCubit>();
-                cubit.setPhoneNumber(_phoneNumberController.text);
-                widget.animateOutForm();
-                cubit.signin();
+                if (_form.currentState!.validate()) {
+                  _animateOut();
+                  final cubit = context.read<SigninCubit>();
+                  cubit.setPhoneNumber(_phoneNumberController.text);
+                  widget.animateOutForm();
+                  cubit.signin();
+                } else {
+                  _enablePaddingForErrorText();
+                }
               },
             ),
           ),

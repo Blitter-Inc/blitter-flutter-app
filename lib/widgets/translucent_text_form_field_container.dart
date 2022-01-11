@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class TranslucentTextFormFieldContainer extends StatelessWidget {
   final TextFormField child;
   final double paddingHorizontal;
+  final double paddingVertical;
 
   const TranslucentTextFormFieldContainer({
     Key? key,
     required this.child,
     this.paddingHorizontal = 15,
+    this.paddingVertical = 0,
   }) : super(key: key);
 
   @override
@@ -19,7 +21,7 @@ class TranslucentTextFormFieldContainer extends StatelessWidget {
         decoration: const BoxDecoration(
           color: Colors.white10,
         ),
-        padding: EdgeInsets.symmetric(horizontal: paddingHorizontal),
+        padding: EdgeInsets.only(left: paddingHorizontal, right: paddingHorizontal, bottom: paddingVertical),
         child: child,
       ),
     );
