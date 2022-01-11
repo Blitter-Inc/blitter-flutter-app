@@ -6,7 +6,16 @@ import '../models/models.dart';
 
 class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
   AuthBloc() : super(AuthState()) {
-    on((event, emit) => null);
+    on<UserLoggedIn>((event, emit) {
+      emit(
+        AuthState(
+          accessToken: event.accessToken,
+          refreshToken: event.refreshToken,
+          firebaseId: event.firebaseId,
+          user: event.user,
+        ),
+      );
+    });
   }
 
   @override

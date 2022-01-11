@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:blitter_flutter_app/data/blocs.dart';
 import '../../auth/widgets/avatar.dart';
 import '../../home/screens/dashboard_screen.dart';
 import '../../../widgets/gradient_button.dart';
@@ -27,6 +29,8 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
 
   @override
   Widget build(BuildContext context) {
+    final userState = context.read<AuthBloc>().state.user;
+
     return Form(
       child: Container(
         padding: const EdgeInsets.only(top: 85),
@@ -39,7 +43,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
             TranslucentTextFormFieldContainer(
               paddingHorizontal: 5,
               child: TextFormField(
-                controller: _nameController,
+                controller: _nameController..text = userState?.name ?? '',
                 textCapitalization: TextCapitalization.words,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
@@ -56,7 +60,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
             TranslucentTextFormFieldContainer(
               paddingHorizontal: 5,
               child: TextFormField(
-                controller: _emailController,
+                controller: _emailController..text = userState?.email ?? '',
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
@@ -73,7 +77,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
             TranslucentTextFormFieldContainer(
               paddingHorizontal: 5,
               child: TextFormField(
-                controller: _bioController,
+                controller: _bioController..text = userState?.bio ?? '',
                 textCapitalization: TextCapitalization.sentences,
                 maxLines: 3,
                 decoration: InputDecoration(

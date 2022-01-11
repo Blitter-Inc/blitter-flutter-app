@@ -1,11 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/config/animation.dart';
-import 'package:blitter_flutter_app/data/cubits/cubits.dart';
+import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/widgets/widgets.dart';
 
 class PhoneInputForm extends StatefulWidget {
@@ -103,11 +101,7 @@ class _PhoneInputFormState extends State<PhoneInputForm>
                 final cubit = context.read<SigninCubit>();
                 cubit.setPhoneNumber(_phoneNumberController.text);
                 widget.animateOutForm();
-                if (Platform.isAndroid) {
-                  cubit.sendOTP();
-                } else {
-                  cubit.skipFirebasePhoneAuth();
-                }
+                cubit.signin();
               },
             ),
           ),

@@ -4,8 +4,10 @@ import 'package:flutter_svg/svg.dart';
 
 import 'package:blitter_flutter_app/config/animation.dart';
 import 'package:blitter_flutter_app/config/color.dart';
-import 'package:blitter_flutter_app/data/cubits/cubits.dart';
-import 'package:blitter_flutter_app/widgets/loading_spinner.dart';
+import 'package:blitter_flutter_app/data/blocs.dart';
+import 'package:blitter_flutter_app/data/cubits.dart';
+import 'package:blitter_flutter_app/data/repositories.dart';
+import 'package:blitter_flutter_app/widgets/widgets.dart';
 import '../widgets/widgets.dart';
 
 class SigninScreen extends StatefulWidget {
@@ -76,10 +78,11 @@ class _SigninScreenState extends State<SigninScreen>
     _formOpacityController.forward();
   }
 
-  Future<void> _verificationFailedHandler() async {
+  Future<void> _verificationFailedHandler(Exception e) async {
+    // handle error display logic here
+    print(e);
     await _deactivateLoader();
     _formOpacityController.forward();
-    // handle error display logic here
   }
 
   @override
@@ -121,9 +124,12 @@ class _SigninScreenState extends State<SigninScreen>
     return BlocProvider(
       lazy: false,
       create: (_) => SigninCubit(
-        codeSent: _codeSentHandler,
-        verificationCompleted: _verificationCompletedHandler,
-        verificationFailed: _verificationFailedHandler,
+        authBloc: context.read<AuthBloc>(),
+        apiRepository: context.read<APIRepository>(),
+        apiSerializerRepository: context.read<APISerializerRepository>(),
+        codeSentHandler: _codeSentHandler,
+        verificationCompletedHandler: _verificationCompletedHandler,
+        verificationFailedHandler: _verificationFailedHandler,
       ),
       child: Scaffold(
         extendBodyBehindAppBar: true,
@@ -165,9 +171,9 @@ class _SigninScreenState extends State<SigninScreen>
                           opacity: _logoOpacity,
                           child: const BlitterText(),
                         ),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 40),
                         SizedBox(
-                          height: 220,
+                          height: 205,
                           child: _isLoading
                               ? _formFadeTransitionContainer(
                                   const LoadingSpinner())

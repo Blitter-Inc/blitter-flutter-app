@@ -9,7 +9,8 @@ import 'package:path_provider/path_provider.dart';
 import 'firebase_options.dart';
 
 import './app.dart';
-import './data/blocs/blocs.dart';
+import './data/blocs.dart';
+import './data/repositories.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,13 +26,23 @@ void main() async {
   }
   HydratedBlocOverrides.runZoned(
     () => runApp(
-      MultiBlocProvider(
+      MultiRepositoryProvider(
         providers: [
-          BlocProvider<AuthBloc>(
-            create: (_) => AuthBloc(),
+          RepositoryProvider<APIRepository>(
+            create: (_) => APIRepository(),
+          ),
+          RepositoryProvider<APISerializerRepository>(
+            create: (_) => APISerializerRepository(),
           ),
         ],
-        child: const BlitterApp(),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthBloc>(
+              create: (_) => AuthBloc(),
+            ),
+          ],
+          child: const BlitterApp(),
+        ),
       ),
     ),
     storage: await HydratedStorage.build(
