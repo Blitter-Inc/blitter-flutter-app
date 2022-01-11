@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../widgets/blitter_text.dart';
-import '../widgets/otp_input_form.dart';
-import '../widgets/phone_input_form.dart';
-import '../widgets/update_profile_form.dart';
-import '../../../constants/animation.dart';
-import '../../../constants/color.dart';
-import '../../../widgets/loading_spinner.dart';
+import 'package:blitter_flutter_app/config/animation.dart';
+import 'package:blitter_flutter_app/config/color.dart';
+import 'package:blitter_flutter_app/data/cubits/cubits.dart';
+import 'package:blitter_flutter_app/widgets/loading_spinner.dart';
+import '../widgets/widgets.dart';
 
 class SigninScreen extends StatefulWidget {
   static const route = '/sign-in';
@@ -31,6 +30,57 @@ class _SigninScreenState extends State<SigninScreen>
   late Animation<double> _formOpacity;
   late AnimationController _logoOpacityController;
   late Animation<double> _logoOpacity;
+
+  Widget _formFadeTransitionContainer(Widget child) {
+    return FadeTransition(
+      opacity: _formOpacity,
+      child: child,
+    );
+  }
+
+  Future<void> _activateLoader() async {
+    await Future.delayed(const Duration(milliseconds: 800));
+    setState(() {
+      _isLoading = true;
+    });
+    _formOpacityController.forward();
+  }
+
+  Future<void> _deactivateLoader() async {
+    _formOpacityController.reverse();
+    await Future.delayed(const Duration(milliseconds: 1000));
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _animateOutForm() async {
+    _formOpacityController.reverse();
+    await _activateLoader();
+  }
+
+  Future<void> _codeSentHandler() async {
+    await _deactivateLoader();
+    setState(() {
+      _otpSent = true;
+    });
+    _formOpacityController.forward();
+  }
+
+  Future<void> _verificationCompletedHandler() async {
+    _logoOpacityController.forward();
+    await _deactivateLoader();
+    setState(() {
+      _otpVerified = true;
+    });
+    _formOpacityController.forward();
+  }
+
+  Future<void> _verificationFailedHandler() async {
+    await _deactivateLoader();
+    _formOpacityController.forward();
+    // handle error display logic here
+  }
 
   @override
   void initState() {
@@ -56,6 +106,7 @@ class _SigninScreenState extends State<SigninScreen>
       ),
     );
     _formOpacityController.forward();
+    // _formOpacityController.addStatusListener((status) async {});
   }
 
   @override
@@ -65,110 +116,78 @@ class _SigninScreenState extends State<SigninScreen>
     super.dispose();
   }
 
-  Widget _formFadeTransitionContainer(Widget child) {
-    return FadeTransition(
-      opacity: _formOpacity,
-      child: child,
-    );
-  }
-
-  Future<void> _activateLoader() async {
-    await Future.delayed(const Duration(milliseconds: 800));
-    setState(() {
-      _isLoading = true;
-    });
-    _formOpacityController.forward();
-  }
-
-  Future<void> _deactivateLoader() async {
-    _formOpacityController.reverse();
-    await Future.delayed(const Duration(milliseconds: 1000));
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  Future<void> sendOTP() async {
-    _formOpacityController.reverse();
-    await _activateLoader();
-    await Future.delayed(const Duration(seconds: 1));
-    await _deactivateLoader();
-    setState(() {
-      _otpSent = true;
-    });
-    _formOpacityController.forward();
-  }
-
-  Future<void> verifyOTP() async {
-    _formOpacityController.reverse();
-    await _activateLoader();
-    await Future.delayed(const Duration(seconds: 1));
-    _logoOpacityController.forward();
-    await _deactivateLoader();
-    setState(() {
-      _otpVerified = true;
-    });
-    _formOpacityController.forward();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: _otpVerified
-            ? Text(
-                'Update Profile',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  foreground: Paint()..shader = foregroundShader,
-                ),
-              )
-            : null,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+    return BlocProvider(
+      lazy: false,
+      create: (_) => SigninCubit(
+        codeSent: _codeSentHandler,
+        verificationCompleted: _verificationCompletedHandler,
+        verificationFailed: _verificationFailedHandler,
       ),
-      body: Stack(
-        children: [
-          SvgPicture.string(
-            backgroundSvg,
-            height: double.infinity,
-            width: double.infinity,
-            fit: BoxFit.fitHeight,
-          ),
-          Container(
-            decoration: BoxDecoration(color: Colors.black.withOpacity(0.3)),
-          ),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 25),
-            alignment: Alignment.center,
-            child: _otpVerified
-                ? _formFadeTransitionContainer(const UpdateProfileForm())
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      FadeTransition(
-                        opacity: _logoOpacity,
-                        child: const BlitterText(),
-                      ),
-                      const SizedBox(height: 25),
-                      SizedBox(
-                        height: 220,
-                        child: _isLoading
-                            ? _formFadeTransitionContainer(
-                                const LoadingSpinner())
-                            : !_otpSent
-                                ? _formFadeTransitionContainer(
-                                    PhoneInputForm(onSubmit: sendOTP))
-                                : _formFadeTransitionContainer(
-                                    OTPInputForm(onSubmit: verifyOTP)),
-                      ),
-                    ],
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          title: _otpVerified
+              ? Text(
+                  'Update Profile',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    foreground: Paint()..shader = foregroundShader,
                   ),
-          ),
-        ],
+                )
+              : null,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
+        body: Stack(
+          children: [
+            SvgPicture.string(
+              backgroundSvg,
+              height: double.infinity,
+              width: double.infinity,
+              fit: BoxFit.fitHeight,
+            ),
+            Container(
+              decoration: BoxDecoration(color: Colors.black.withOpacity(0.3)),
+            ),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              alignment: Alignment.center,
+              child: _otpVerified
+                  ? _formFadeTransitionContainer(const UpdateProfileForm())
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        FadeTransition(
+                          opacity: _logoOpacity,
+                          child: const BlitterText(),
+                        ),
+                        const SizedBox(height: 25),
+                        SizedBox(
+                          height: 220,
+                          child: _isLoading
+                              ? _formFadeTransitionContainer(
+                                  const LoadingSpinner())
+                              : !_otpSent
+                                  ? _formFadeTransitionContainer(
+                                      PhoneInputForm(
+                                        animateOutForm: _animateOutForm,
+                                      ),
+                                    )
+                                  : _formFadeTransitionContainer(
+                                      OTPInputForm(
+                                        animateOutForm: _animateOutForm,
+                                      ),
+                                    ),
+                        ),
+                      ],
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
