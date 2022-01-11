@@ -14,4 +14,12 @@ class UserLoggedIn extends AuthEvent {
     required this.firebaseId,
     required this.user,
   });
+
+  UserLoggedIn.fromJson(Map<String, dynamic> json)
+      : accessToken = json['accessToken'],
+        refreshToken = json['refreshToken'],
+        firebaseId = json['firebaseId'],
+        user = User.fromJson(json['user']);
 }
+
+// class UserProfileUpdated {}

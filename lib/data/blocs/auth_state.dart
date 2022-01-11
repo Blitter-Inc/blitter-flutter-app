@@ -1,4 +1,4 @@
-import '../models/models.dart';
+import '../models.dart';
 
 class AuthState {
   String? accessToken;

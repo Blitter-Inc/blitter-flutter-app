@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/config/animation.dart';
-import 'package:blitter_flutter_app/data/cubits/cubits.dart';
+import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/widgets/widgets.dart';
 import './otp_input_field.dart';
 
