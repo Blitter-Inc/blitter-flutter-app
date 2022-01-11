@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:blitter_flutter_app/data/blocs.dart';
 import './modules/auth/screens/signin_screen.dart';
 import './modules/home/screens/dashboard_screen.dart';
 
@@ -8,6 +10,13 @@ class BlitterApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authBloc = context.read<AuthBloc>();
+
+    // uncomment the following lines to clear storage
+    // authBloc.clear();
+
+    final isLoggedIn = authBloc.state.user != null;
+
     return MaterialApp(
       title: 'Blitter',
       theme: ThemeData(
@@ -22,7 +31,7 @@ class BlitterApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.dark,
-      initialRoute: SigninScreen.route,
+      initialRoute: isLoggedIn ? DashboardScreen.route : SigninScreen.route,
       routes: {
         SigninScreen.route: (_) => const SigninScreen(),
         DashboardScreen.route: (_) => const DashboardScreen(),
