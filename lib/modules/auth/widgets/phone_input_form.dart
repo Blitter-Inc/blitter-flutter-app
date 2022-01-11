@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -101,7 +103,11 @@ class _PhoneInputFormState extends State<PhoneInputForm>
                 final cubit = context.read<SigninCubit>();
                 cubit.setPhoneNumber(_phoneNumberController.text);
                 widget.animateOutForm();
-                cubit.sendOTP();
+                if (Platform.isAndroid) {
+                  cubit.sendOTP();
+                } else {
+                  cubit.skipFirebasePhoneAuth();
+                }
               },
             ),
           ),

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,11 +16,27 @@ class SigninCubit extends Cubit<SigninState> {
     required this.codeSent,
     required this.verificationCompleted,
     required this.verificationFailed,
-  }) : super(SigninState());
+  }) : super(SigninState()) {
+    if (Platform.isAndroid) {
+      auth = FirebaseAuth.instance;
+    }
+  }
 
-  final auth = FirebaseAuth.instance;
+  FirebaseAuth? auth;
   final _apiRepository = APIRepository();
   final _apiSerializerRepository = APISerializerRepository();
+
+  Future<void> _signinAPICall(String? firebaseId) async {
+    final apiRes = await _apiRepository.signIn(
+      _apiSerializerRepository.signInRequestSerializer({
+        'phoneNumber': '+91${state.phoneNumber}',
+        'firebaseId': firebaseId ?? state.phoneNumber,
+      }),
+    );
+    final apiResBody = jsonDecode(apiRes.body);
+    // Put user info into state
+    print(apiResBody);
+  }
 
   void setPhoneNumber(String phoneNumber) {
     emit(state.copyWith(phoneNumber: phoneNumber));
@@ -34,10 +51,10 @@ class SigninCubit extends Cubit<SigninState> {
   }
 
   Future<void> sendOTP() async {
-    await auth.verifyPhoneNumber(
+    await auth?.verifyPhoneNumber(
       phoneNumber: '+91${state.phoneNumber}',
       verificationCompleted: (PhoneAuthCredential credential) async {
-        final res = await auth.signInWithCredential(credential);
+        final res = await auth?.signInWithCredential(credential);
         // Do something with credentials here
         print(res);
         await verificationCompleted();
@@ -58,17 +75,14 @@ class SigninCubit extends Cubit<SigninState> {
   Future<void> verifyOTP() async {
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: state.verificationId, smsCode: state.code);
-    final firebaseUserCredential = await auth.signInWithCredential(credential);
+    final firebaseUserCredential = await auth?.signInWithCredential(credential);
     print(firebaseUserCredential);
-    final apiRes = await _apiRepository.signIn(
-      _apiSerializerRepository.signInRequestSerializer({
-        'phoneNumber': firebaseUserCredential.user?.phoneNumber,
-        'firebaseId': firebaseUserCredential.user?.uid,
-      }),
-    );
-    final apiResBody = jsonDecode(apiRes.body);
-    print(apiResBody);
-    // Put user info into state
+    await _signinAPICall(firebaseUserCredential?.user?.uid);
+    await verificationCompleted();
+  }
+
+  Future<void> skipFirebasePhoneAuth() async {
+    await _signinAPICall(null);
     await verificationCompleted();
   }
 }
