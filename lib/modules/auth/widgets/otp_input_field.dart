@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:blitter_flutter_app/data/cubits.dart';
 
 class OTPInputField extends StatelessWidget {
   final List<FocusNode> pinFocusNodes;
@@ -10,7 +13,8 @@ class OTPInputField extends StatelessWidget {
     required this.pinEditingControllers,
   }) : super(key: key);
 
-  Widget _pinDigitContainer(int index) {
+  Widget _pinDigitContainer(int index, SigninCubit cubit) {
+    final code = cubit.state.code;
     var focusNode = pinFocusNodes[index];
     var controller = pinEditingControllers[index];
 
@@ -25,7 +29,7 @@ class OTPInputField extends StatelessWidget {
         ),
         padding: const EdgeInsets.only(left: 4, right: 2),
         child: TextFormField(
-          controller: controller,
+          controller: controller..text = code.isNotEmpty ? code[index] : '',
           focusNode: focusNode,
           onChanged: (digit) {
             if (digit.isEmpty) {
@@ -56,9 +60,11 @@ class OTPInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<SigninCubit>();
+
     return FittedBox(
       child: Row(
-        children: List.generate(6, (index) => _pinDigitContainer(index)),
+        children: List.generate(6, (index) => _pinDigitContainer(index, cubit)),
       ),
     );
   }

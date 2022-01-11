@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:blitter_flutter_app/data/exceptions.dart';
 import './signin_state.dart';
 import '../blocs/blocs.dart';
 import '../repositories/repositories.dart';
@@ -14,7 +15,7 @@ class SigninCubit extends Cubit<SigninState> {
   final APISerializerRepository apiSerializerRepository;
   final AsyncCallback codeSentHandler;
   final AsyncCallback verificationCompletedHandler;
-  final AsyncValueSetter<Exception> verificationFailedHandler;
+  final AsyncValueSetter<AuthException> verificationFailedHandler;
   FirebaseAuth? auth;
 
   SigninCubit({
@@ -63,11 +64,14 @@ class SigninCubit extends Cubit<SigninState> {
         await codeSentHandler();
       },
       verificationFailed: (FirebaseAuthException e) async {
-        await verificationFailedHandler(e);
+        await verificationFailedHandler(
+          AuthException(
+            code: e.code,
+            message: e.message,
+          ),
+        );
       },
-      codeAutoRetrievalTimeout: (String verificationId) {
-        print('AutoCodeRetrievalTimeout: $verificationId');
-      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
     );
   }
 
@@ -89,18 +93,51 @@ class SigninCubit extends Cubit<SigninState> {
   }
 
   Future<void> signin() async {
-    if (Platform.isAndroid) {
-      await _sendOTP();
-    } else {
-      await _skipFirebasePhoneAuth();
+    try {
+      if (Platform.isAndroid) {
+        await _sendOTP();
+      } else {
+        await _skipFirebasePhoneAuth();
+      }
+    } on FirebaseAuthException catch (e) {
+      await verificationFailedHandler(
+        AuthException(
+          code: e.code,
+          message: e.message,
+        ),
+      );
+    } on Exception catch (e) {
+      await verificationFailedHandler(
+        AuthException(
+          code: 'unknown',
+          message: e.toString(),
+        ),
+      );
     }
   }
 
   Future<void> verifyOTP() async {
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: state.verificationId, smsCode: state.code);
-    final firebaseUserCredential = await auth?.signInWithCredential(credential);
-    await _signinAPICall(firebaseUserCredential?.user?.uid);
-    await verificationCompletedHandler();
+    try {
+      final firebaseUserCredential =
+          await auth?.signInWithCredential(credential);
+      await _signinAPICall(firebaseUserCredential?.user?.uid);
+      await verificationCompletedHandler();
+    } on FirebaseAuthException catch (e) {
+      await verificationFailedHandler(
+        AuthException(
+          code: e.code,
+          message: e.message,
+        ),
+      );
+    } on Exception catch (e) {
+      await verificationFailedHandler(
+        AuthException(
+          code: 'unknown',
+          message: e.toString(),
+        ),
+      );
+    }
   }
 }

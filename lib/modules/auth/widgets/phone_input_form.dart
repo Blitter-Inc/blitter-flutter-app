@@ -84,6 +84,8 @@ class _PhoneInputFormState extends State<PhoneInputForm>
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<SigninCubit>();
+
     return Form(
       key: _form,
       child: Column(
@@ -98,7 +100,8 @@ class _PhoneInputFormState extends State<PhoneInputForm>
                     return 'Provide a valid phone number';
                   }
                 },
-                controller: _phoneNumberController,
+                controller: _phoneNumberController
+                  ..text = cubit.state.phoneNumber,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 maxLength: 10,
                 keyboardType: TextInputType.number,
@@ -119,7 +122,6 @@ class _PhoneInputFormState extends State<PhoneInputForm>
               onPressed: () {
                 if (_form.currentState!.validate()) {
                   _animateOut();
-                  final cubit = context.read<SigninCubit>();
                   cubit.setPhoneNumber(_phoneNumberController.text);
                   widget.animateOutForm();
                   cubit.signin();

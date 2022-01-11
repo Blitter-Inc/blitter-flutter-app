@@ -108,12 +108,13 @@ class _OTPInputFormState extends State<OTPInputForm>
             title: 'Verify',
             onPressed: () {
               String otp = pinEditingControllers.map((e) => e.text).join();
-              print(otp);
-              _animateOut();
-              final cubit = context.read<SigninCubit>();
-              cubit.setCode(otp);
-              widget.animateOutForm();
-              cubit.verifyOTP();
+              if (otp.length == 6) {
+                _animateOut();
+                final cubit = context.read<SigninCubit>();
+                cubit.setCode(otp);
+                widget.animateOutForm();
+                cubit.verifyOTP();
+              }
             },
           ),
         ),

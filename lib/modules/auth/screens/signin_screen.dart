@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,8 +7,10 @@ import 'package:blitter_flutter_app/config/animation.dart';
 import 'package:blitter_flutter_app/config/color.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
+import 'package:blitter_flutter_app/data/exceptions.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
-import 'package:blitter_flutter_app/widgets/widgets.dart';
+import 'package:blitter_flutter_app/utils.dart';
+import 'package:blitter_flutter_app/widgets.dart';
 import '../widgets/widgets.dart';
 
 class SigninScreen extends StatefulWidget {
@@ -78,11 +81,15 @@ class _SigninScreenState extends State<SigninScreen>
     _formOpacityController.forward();
   }
 
-  Future<void> _verificationFailedHandler(Exception e) async {
-    // handle error display logic here
-    print(e);
-    await _deactivateLoader();
-    _formOpacityController.forward();
+  AsyncValueSetter<AuthException> _buildVerificationFailedHandler(
+      BuildContext context) {
+    return (AuthException e) async {
+      await _deactivateLoader();
+      _formOpacityController.forward();
+      ExceptionUIHandler(context).showSnackbar(
+        AuthExceptionMessage.getErrorMessageFromCode(e.code),
+      );
+    };
   }
 
   @override
@@ -129,7 +136,7 @@ class _SigninScreenState extends State<SigninScreen>
         apiSerializerRepository: context.read<APISerializerRepository>(),
         codeSentHandler: _codeSentHandler,
         verificationCompletedHandler: _verificationCompletedHandler,
-        verificationFailedHandler: _verificationFailedHandler,
+        verificationFailedHandler: _buildVerificationFailedHandler(context),
       ),
       child: Scaffold(
         extendBodyBehindAppBar: true,
