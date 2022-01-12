@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 
-import 'package:blitter_flutter_app/config/config.dart' show apiBaseUrl;
+import 'package:blitter_flutter_app/config.dart' show apiBaseUrl;
 import './types.dart';
 import './abstract/api_repository.dart';
 

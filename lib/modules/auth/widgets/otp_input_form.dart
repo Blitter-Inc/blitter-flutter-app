@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:blitter_flutter_app/config/animation.dart';
+import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
-import 'package:blitter_flutter_app/widgets/widgets.dart';
+import 'package:blitter_flutter_app/widgets.dart';
 import './otp_input_field.dart';
 
 class OTPInputForm extends StatefulWidget {
@@ -107,8 +107,17 @@ class _OTPInputFormState extends State<OTPInputForm>
           child: GradientButton(
             title: 'Verify',
             onPressed: () {
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               String otp = pinEditingControllers.map((e) => e.text).join();
-              if (otp.length == 6) {
+              if (otp.length != 6) {
+                scaffoldMessenger.hideCurrentSnackBar();
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Please provide a valid OTP'),
+                  ),
+                );
+              } else {
+                scaffoldMessenger.clearSnackBars();
                 _animateOut();
                 final cubit = context.read<SigninCubit>();
                 cubit.setCode(otp);

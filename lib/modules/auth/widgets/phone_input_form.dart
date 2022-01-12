@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:blitter_flutter_app/config/animation.dart';
+import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
-import 'package:blitter_flutter_app/widgets/widgets.dart';
+import 'package:blitter_flutter_app/widgets.dart';
 
 class PhoneInputForm extends StatefulWidget {
   final AsyncCallback animateOutForm;
@@ -26,7 +26,6 @@ class _PhoneInputFormState extends State<PhoneInputForm>
   late Animation<Offset> _fieldOffset;
   late Animation<Offset> _buttonOffset;
 
-  final _form = GlobalKey<FormState>();
   final _phoneNumberController = TextEditingController();
   double phoneFieldPaddingVertical = 0;
 
@@ -73,66 +72,57 @@ class _PhoneInputFormState extends State<PhoneInputForm>
     _buttonController.reverse();
   }
 
-  void _enablePaddingForErrorText() async {
-    const double padding = 8;
-    if (phoneFieldPaddingVertical != padding) {
-      setState(() {
-        phoneFieldPaddingVertical = padding;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<SigninCubit>();
 
-    return Form(
-      key: _form,
-      child: Column(
-        children: [
-          SlideTransition(
-            position: _fieldOffset,
-            child: TranslucentTextFormFieldContainer(
-              paddingVertical: phoneFieldPaddingVertical,
-              child: TextFormField(
-                validator: (value) {
-                  if (value == null || value.length != 10 || value[0] == '0') {
-                    return 'Provide a valid phone number';
-                  }
-                },
-                controller: _phoneNumberController
-                  ..text = cubit.state.phoneNumber,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                maxLength: 10,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  counterText: '',
-                  label: Text('Enter Phone Number'),
-                  prefixText: '+91 ',
-                  border: InputBorder.none,
-                ),
+    return Column(
+      children: [
+        SlideTransition(
+          position: _fieldOffset,
+          child: TranslucentTextFormFieldContainer(
+            paddingVertical: phoneFieldPaddingVertical,
+            child: TextFormField(
+              controller: _phoneNumberController
+                ..text = cubit.state.phoneNumber,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              maxLength: 10,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                counterText: '',
+                label: Text('Enter Phone Number'),
+                prefixText: '+91 ',
+                border: InputBorder.none,
               ),
             ),
           ),
-          const SizedBox(height: 30),
-          SlideTransition(
-            position: _buttonOffset,
-            child: GradientButton(
-              title: 'Continue >',
-              onPressed: () {
-                if (_form.currentState!.validate()) {
-                  _animateOut();
-                  cubit.setPhoneNumber(_phoneNumberController.text);
-                  widget.animateOutForm();
-                  cubit.signin();
-                } else {
-                  _enablePaddingForErrorText();
-                }
-              },
-            ),
+        ),
+        const SizedBox(height: 30),
+        SlideTransition(
+          position: _buttonOffset,
+          child: GradientButton(
+            title: 'Continue >',
+            onPressed: () {
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+              final phoneNumber = _phoneNumberController.text;
+              if (phoneNumber.length != 10 || phoneNumber[0] == '0') {
+                scaffoldMessenger.hideCurrentSnackBar();
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Please provide valid phone number'),
+                  ),
+                );
+              } else {
+                scaffoldMessenger.clearSnackBars();
+                _animateOut();
+                cubit.setPhoneNumber(_phoneNumberController.text);
+                widget.animateOutForm();
+                cubit.signin();
+              }
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

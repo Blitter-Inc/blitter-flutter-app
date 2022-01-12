@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/color.dart';
+import 'package:blitter_flutter_app/config.dart';
 
 class BlitterText extends StatelessWidget {
   const BlitterText({Key? key}) : super(key: key);

@@ -29,6 +29,12 @@ class BlitterApp extends StatelessWidget {
           primary: Colors.lightGreen,
           primaryVariant: Colors.teal,
         ),
+        snackBarTheme: const SnackBarThemeData(
+          contentTextStyle: TextStyle(
+            color: Colors.black,
+          ),
+          backgroundColor: Colors.lightGreen,
+        ),
       ),
       themeMode: ThemeMode.dark,
       initialRoute: isLoggedIn ? DashboardScreen.route : SigninScreen.route,

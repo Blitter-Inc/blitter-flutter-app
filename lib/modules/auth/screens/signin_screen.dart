@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-import 'package:blitter_flutter_app/config/animation.dart';
-import 'package:blitter_flutter_app/config/color.dart';
+import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/exceptions.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
-import 'package:blitter_flutter_app/utils.dart';
 import 'package:blitter_flutter_app/widgets.dart';
 import '../widgets/widgets.dart';
 
@@ -86,8 +84,12 @@ class _SigninScreenState extends State<SigninScreen>
     return (AuthException e) async {
       await _deactivateLoader();
       _formOpacityController.forward();
-      ExceptionUIHandler(context).showSnackbar(
-        AuthExceptionMessage.getErrorMessageFromCode(e.code),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AuthExceptionMessage.getErrorMessageFromCode(e.code),
+          ),
+        ),
       );
     };
   }
