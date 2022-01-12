@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
-import './modules/auth/screens/signin_screen.dart';
-import './modules/home/screens/dashboard_screen.dart';
+import './ui.dart';
 
 class BlitterApp extends StatelessWidget {
   const BlitterApp({Key? key}) : super(key: key);

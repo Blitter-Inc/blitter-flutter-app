@@ -8,8 +8,8 @@ import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/exceptions.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
-import 'package:blitter_flutter_app/widgets.dart';
-import '../widgets/widgets.dart';
+import 'package:blitter_flutter_app/ui/shared.dart';
+import './widgets/widgets.dart';
 
 class SigninScreen extends StatefulWidget {
   static const route = '/sign-in';

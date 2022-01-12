@@ -1,39 +1,36 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
-import 'package:blitter_flutter_app/widgets.dart';
-import './otp_input_field.dart';
+import 'package:blitter_flutter_app/ui/shared.dart';
 
-class OTPInputForm extends StatefulWidget {
+class PhoneInputForm extends StatefulWidget {
   final AsyncCallback animateOutForm;
 
-  const OTPInputForm({
+  const PhoneInputForm({
     Key? key,
     required this.animateOutForm,
   }) : super(key: key);
 
   @override
-  _OTPInputFormState createState() => _OTPInputFormState();
+  _PhoneInputFormState createState() => _PhoneInputFormState();
 }
 
-class _OTPInputFormState extends State<OTPInputForm>
+class _PhoneInputFormState extends State<PhoneInputForm>
     with TickerProviderStateMixin {
   late AnimationController _fieldController;
   late AnimationController _buttonController;
   late Animation<Offset> _fieldOffset;
   late Animation<Offset> _buttonOffset;
 
-  late List<FocusNode> pinFocusNodes;
-  late List<TextEditingController> pinEditingControllers;
+  final _phoneNumberController = TextEditingController();
+  double phoneFieldPaddingVertical = 0;
 
   @override
   void initState() {
-    pinFocusNodes = List.generate(6, (_) => FocusNode());
-    pinEditingControllers = List.generate(6, (_) => TextEditingController());
-
     _fieldController = AnimationController(
       vsync: this,
       duration: defaultTransitionDuration,
@@ -65,9 +62,8 @@ class _OTPInputFormState extends State<OTPInputForm>
 
   @override
   void dispose() {
-    _fieldController.reverse();
-    _buttonController.reverse();
-
+    _fieldController.dispose();
+    _buttonController.dispose();
     super.dispose();
   }
 
@@ -78,51 +74,50 @@ class _OTPInputFormState extends State<OTPInputForm>
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<SigninCubit>();
+
     return Column(
       children: [
         SlideTransition(
           position: _fieldOffset,
-          child: Column(
-            children: [
-              Container(
-                constraints: const BoxConstraints(minWidth: 300),
-                padding: const EdgeInsets.only(bottom: 15),
-                child: Text(
-                  'Enter the OTP sent to your mobile',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
+          child: TranslucentTextFormFieldContainer(
+            paddingVertical: phoneFieldPaddingVertical,
+            child: TextFormField(
+              controller: _phoneNumberController
+                ..text = cubit.state.phoneNumber,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              maxLength: 10,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                counterText: '',
+                label: Text('Enter Phone Number'),
+                prefixText: '+91 ',
+                border: InputBorder.none,
               ),
-              OTPInputField(
-                pinFocusNodes: pinFocusNodes,
-                pinEditingControllers: pinEditingControllers,
-              ),
-            ],
+            ),
           ),
         ),
         const SizedBox(height: 30),
         SlideTransition(
           position: _buttonOffset,
           child: GradientButton(
-            title: 'Verify',
+            title: 'Continue >',
             onPressed: () {
               final scaffoldMessenger = ScaffoldMessenger.of(context);
-              String otp = pinEditingControllers.map((e) => e.text).join();
-              if (otp.length != 6) {
+              final phoneNumber = _phoneNumberController.text;
+              if (phoneNumber.length != 10 || phoneNumber[0] == '0') {
                 scaffoldMessenger.hideCurrentSnackBar();
                 scaffoldMessenger.showSnackBar(
                   const SnackBar(
-                    content: Text('Please provide a valid OTP'),
+                    content: Text('Please provide valid phone number'),
                   ),
                 );
               } else {
                 scaffoldMessenger.clearSnackBars();
                 _animateOut();
-                final cubit = context.read<SigninCubit>();
-                cubit.setCode(otp);
+                cubit.setPhoneNumber(_phoneNumberController.text);
                 widget.animateOutForm();
-                cubit.verifyOTP();
+                cubit.signin();
               }
             },
           ),

@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
-import '../../auth/widgets/avatar.dart';
-import '../../home/screens/dashboard_screen.dart';
-import '../../../widgets/gradient_button.dart';
-import '../../../widgets/translucent_text_form_field_container.dart';
+import 'package:blitter_flutter_app/ui.dart';
+import 'package:blitter_flutter_app/ui/shared.dart';
+import './avatar.dart';
 
 class UpdateProfileForm extends StatefulWidget {
   const UpdateProfileForm({Key? key}) : super(key: key);
