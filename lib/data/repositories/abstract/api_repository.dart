@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 
-import '../types.dart';
+import '../../types.dart';
 
 abstract class IAPIRepository {
   Future<http.Response> signIn(JsonMap payload);

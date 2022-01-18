@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:blitter_flutter_app/config.dart' show apiBaseUrl;
 import 'package:blitter_flutter_app/data/blocs.dart' show AuthState;
-import './types.dart';
+import '../types.dart';
 import './abstract/api_repository.dart';
 
 class ApiURI {
