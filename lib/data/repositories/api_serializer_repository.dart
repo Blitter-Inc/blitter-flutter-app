@@ -1,4 +1,4 @@
-import './types.dart';
+import '../types.dart';
 
 class APISerializerRepository {
   Map<String, dynamic> _generateUserObject(body) {
