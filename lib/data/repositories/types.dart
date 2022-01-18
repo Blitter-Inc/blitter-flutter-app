@@ -1,2 +1,1 @@
-typedef RequestPayload = Map<String, dynamic>;
-typedef ResponseBody = Map<String, dynamic>;
+typedef JsonMap = Map<String, dynamic>;

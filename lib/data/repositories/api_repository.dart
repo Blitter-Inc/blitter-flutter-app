@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 
 import 'package:blitter_flutter_app/config.dart' show apiBaseUrl;
+import 'package:blitter_flutter_app/data/blocs.dart' show AuthState;
 import './types.dart';
 import './abstract/api_repository.dart';
 
@@ -32,14 +33,26 @@ class ApiURI {
     return _generateUri('bill-manager/bill/');
   }
 
-  static Uri updateBill(String id) {
+  static Uri updateBill(int id) {
     return _generateUri('bill-manager/bill/$id/');
   }
 }
 
 class APIRepository extends IAPIRepository {
+  final AuthState authState;
+
+  APIRepository({
+    required this.authState,
+  });
+
+  Map<String, String> _getAuthHeaders() {
+    return {
+      'Authorization': 'Bearer ${authState.accessToken}',
+    };
+  }
+
   @override
-  Future<http.Response> signIn(RequestPayload payload) async {
+  Future<http.Response> signIn(JsonMap payload) async {
     var response = await http.post(
       ApiURI.signIn(),
       body: payload,
@@ -48,7 +61,7 @@ class APIRepository extends IAPIRepository {
   }
 
   @override
-  Future<http.StreamedResponse> updateProfile(RequestPayload payload) async {
+  Future<http.StreamedResponse> updateProfile(JsonMap payload) async {
     var request =
         http.MultipartRequest('POST', ApiURI.updateBill(payload['id']))
           ..files.add(await http.MultipartFile.fromPath(
@@ -66,9 +79,38 @@ class APIRepository extends IAPIRepository {
   }
 
   @override
-  Future<http.Response> fetchUserProfiles(RequestPayload payload) async {
+  Future<http.Response> fetchUserProfiles(JsonMap payload) async {
     var response = await http.post(
       ApiURI.fetchUserProfiles(),
+      body: payload,
+    );
+    return response;
+  }
+
+  @override
+  Future<http.Response> fetchBills() async {
+    var response = await http.get(
+      ApiURI.fetchBills(),
+      headers: _getAuthHeaders(),
+    );
+    return response;
+  }
+
+  @override
+  Future<http.Response> createBill(JsonMap payload) async {
+    var response = await http.post(
+      ApiURI.createBill(),
+      headers: _getAuthHeaders(),
+      body: payload,
+    );
+    return response;
+  }
+
+  @override
+  Future<http.Response> updateBill(int id, JsonMap payload) async {
+    var response = await http.patch(
+      ApiURI.updateBill(id),
+      headers: _getAuthHeaders(),
       body: payload,
     );
     return response;
