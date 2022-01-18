@@ -12,7 +12,7 @@ class BillState {
   int? currentPage;
   bool? hasNext;
   String? ordering;
-  List<String>? orderedSequence;
+  List<int>? orderedSequence;
   Map<String, Bill>? objectMap;
 
   BillState({
@@ -34,8 +34,7 @@ class BillState {
     required this.objectMap,
     this.ordering = FetchAPIOrderingOptions.latestFirst,
     this.currentPage = 1,
-    this.lastRefreshed,
-  });
+  }) : lastRefreshed = DateTime.now().toString();
 
   BillState.fromCache({
     required this.totalCount,
@@ -51,7 +50,7 @@ class BillState {
   BillState copyWithNextPage({
     required int currentPage,
     required bool hasNext,
-    required List<String> orderedSequence,
+    required List<int> orderedSequence,
     required Map<String, Bill> objectMap,
   }) =>
       BillState(

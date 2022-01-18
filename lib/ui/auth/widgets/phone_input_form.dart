@@ -72,9 +72,28 @@ class _PhoneInputFormState extends State<PhoneInputForm>
     _buttonController.reverse();
   }
 
+  void _onSubmit(SigninCubit cubit, ScaffoldMessengerState scaffoldMessenger) {
+    final phoneNumber = _phoneNumberController.text;
+    if (phoneNumber.length != 10 || phoneNumber[0] == '0') {
+      scaffoldMessenger.hideCurrentSnackBar();
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Please provide valid phone number'),
+        ),
+      );
+    } else {
+      scaffoldMessenger.clearSnackBars();
+      _animateOut();
+      cubit.setPhoneNumber(_phoneNumberController.text);
+      widget.animateOutForm();
+      cubit.signin();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<SigninCubit>();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     return Column(
       children: [
@@ -83,6 +102,7 @@ class _PhoneInputFormState extends State<PhoneInputForm>
           child: TranslucentTextFormFieldContainer(
             paddingVertical: phoneFieldPaddingVertical,
             child: TextFormField(
+              onFieldSubmitted: (_) => _onSubmit(cubit, scaffoldMessenger),
               controller: _phoneNumberController
                 ..text = cubit.state.phoneNumber,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -102,24 +122,7 @@ class _PhoneInputFormState extends State<PhoneInputForm>
           position: _buttonOffset,
           child: GradientButton(
             title: 'Continue >',
-            onPressed: () {
-              final scaffoldMessenger = ScaffoldMessenger.of(context);
-              final phoneNumber = _phoneNumberController.text;
-              if (phoneNumber.length != 10 || phoneNumber[0] == '0') {
-                scaffoldMessenger.hideCurrentSnackBar();
-                scaffoldMessenger.showSnackBar(
-                  const SnackBar(
-                    content: Text('Please provide valid phone number'),
-                  ),
-                );
-              } else {
-                scaffoldMessenger.clearSnackBars();
-                _animateOut();
-                cubit.setPhoneNumber(_phoneNumberController.text);
-                widget.animateOutForm();
-                cubit.signin();
-              }
-            },
+            onPressed: () => _onSubmit(cubit, scaffoldMessenger),
           ),
         ),
       ],

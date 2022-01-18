@@ -18,13 +18,22 @@ class BillSubscriber {
   });
 
   BillSubscriber.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
-        user = json['user'],
-        amount = json['amount'],
-        amountPaid = json['amountPaid'],
-        fulfilled = json['fulfilled'],
-        createdAt = json['createdAt'],
-        lastUpdatedAt = json['lastUpdatedAt'];
+      : id = json['id']!,
+        user = json['user']!,
+        amount = json['amount']!,
+        amountPaid = json['amountPaid']!,
+        fulfilled = json['fulfilled']!,
+        createdAt = json['createdAt']!,
+        lastUpdatedAt = json['lastUpdatedAt']!;
+
+  BillSubscriber.fromAPIJson(Map<String, dynamic> json)
+      : id = json['id']!,
+        user = json['user']!,
+        amount = json['amount']!,
+        amountPaid = json['amount_paid']!,
+        fulfilled = json['fulfilled']!,
+        createdAt = json['created_at']!,
+        lastUpdatedAt = json['updated_at']!;
 
   Map<String, dynamic> toJson() => {
         'id': id,

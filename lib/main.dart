@@ -26,28 +26,26 @@ void main() async {
   }
   HydratedBlocOverrides.runZoned(
     () => runApp(
-      BlocProvider(
-        create: (_) => AuthBloc(),
-        lazy: false,
-        child: MultiRepositoryProvider(
-          providers: [
-            RepositoryProvider<APIRepository>(
-              create: (context) => APIRepository(
-                authState: context.read<AuthBloc>().state,
-              ),
-            ),
-            RepositoryProvider<APISerializerRepository>(
-              create: (_) => APISerializerRepository(),
-            ),
-          ],
-          child: MultiBlocProvider(
-            providers: [
-              BlocProvider<BillBloc>(
-                create: (_) => BillBloc(),
-              )
-            ],
-            child: const BlitterApp(),
+      MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider<APIRepository>(
+            create: (context) => APIRepository(),
           ),
+          RepositoryProvider<APISerializerRepository>(
+            create: (_) => APISerializerRepository(),
+          ),
+        ],
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthBloc>(
+              create: (_) => AuthBloc(),
+              lazy: false,
+            ),
+            BlocProvider<BillBloc>(
+              create: (_) => BillBloc(),
+            )
+          ],
+          child: const BlitterApp(),
         ),
       ),
     ),
