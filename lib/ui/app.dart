@@ -12,7 +12,9 @@ class BlitterApp extends StatelessWidget {
     final authBloc = context.read<AuthBloc>();
 
     // uncomment the following lines to clear storage
+    // final billBloc = context.read<BillBloc>();
     // authBloc.clear();
+    // billBloc.clear();
 
     final isLoggedIn = authBloc.state.user != null;
 

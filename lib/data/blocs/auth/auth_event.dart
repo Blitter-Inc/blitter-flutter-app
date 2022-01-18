@@ -1,4 +1,4 @@
-import '../models/user_model.dart';
+import 'package:blitter_flutter_app/data/models.dart';
 
 abstract class AuthEvent {}
 
