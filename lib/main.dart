@@ -40,7 +40,14 @@ void main() async {
               create: (_) => APISerializerRepository(),
             ),
           ],
-          child: const BlitterApp(),
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider<BillBloc>(
+                create: (_) => BillBloc(),
+              )
+            ],
+            child: const BlitterApp(),
+          ),
         ),
       ),
     ),

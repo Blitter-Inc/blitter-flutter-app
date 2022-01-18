@@ -1,8 +1,8 @@
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
+import 'package:blitter_flutter_app/data/models.dart';
 import './auth_event.dart';
 import './auth_state.dart';
-import '../models/models.dart';
 
 class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
   AuthBloc() : super(AuthState()) {
