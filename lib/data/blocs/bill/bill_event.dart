@@ -6,9 +6,7 @@ abstract class BillEvent {}
 class InitializeBillState extends BillEvent {
   final BillState stateObj;
 
-  InitializeBillState(this.stateObj);
-
-  InitializeBillState.fromJson(JsonMap json)
+  InitializeBillState(JsonMap json)
       : stateObj = BillState.fromFetchedData(
           totalCount: json['totalCount']!,
           inStateCount: json['orderedSequence']!.length,

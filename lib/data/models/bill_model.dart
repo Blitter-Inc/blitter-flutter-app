@@ -42,10 +42,33 @@ class Bill {
         description = json['description'],
         status = json['status'],
         createdBy = json['createdBy'],
-        subscribers = json['subscribers'],
-        attachments = json['attachments'],
+        subscribers = (json['subscribers'] as List)
+            .map((e) => BillSubscriber.fromJson(e))
+            .toList(),
+        attachments = (json['attachments'] as List)
+            .map((e) => BillAttachment.fromJson(e))
+            .toList(),
         createdAt = json['createdAt'],
         lastUpdatedAt = json['lastUpdatedAt'];
+
+  Bill.fromAPIJson(Map<String, dynamic> json)
+      : id = json['id'],
+        name = json['name'],
+        amount = json['amount'],
+        settledAmt = json['settled_amount'] ?? "0.00",
+        type = json['type'],
+        eventName = json['event_name'],
+        description = json['description'],
+        status = json['status'] ?? "unsettled",
+        createdBy = json['created_by'],
+        subscribers = (json['subscribers'] as List)
+            .map((e) => BillSubscriber.fromAPIJson(e))
+            .toList(),
+        attachments = (json['attachments'] as List)
+            .map((e) => BillAttachment.fromAPIJson(e))
+            .toList(),
+        createdAt = json['created_at'],
+        lastUpdatedAt = json['updated_at'];
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -57,8 +80,8 @@ class Bill {
         'description': description,
         'status': status,
         'createdBy': createdBy,
-        'subscribers': subscribers,
-        'attachments': attachments,
+        'subscribers': subscribers.map((e) => e.toJson()).toList(),
+        'attachments': attachments.map((e) => e.toJson()).toList(),
         'createdAt': createdAt,
         'lastUpdatedAt': lastUpdatedAt,
       };
