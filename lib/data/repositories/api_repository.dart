@@ -39,15 +39,15 @@ class ApiURI {
 }
 
 class APIRepository extends IAPIRepository {
-  final AuthState authState;
+  late AuthState _authState;
 
-  APIRepository({
-    required this.authState,
-  });
+  set authState(AuthState state) {
+    _authState = state;
+  }
 
   Map<String, String> _getAuthHeaders() {
     return {
-      'Authorization': 'Bearer ${authState.accessToken}',
+      'Authorization': 'Bearer ${_authState.accessToken}',
     };
   }
 
