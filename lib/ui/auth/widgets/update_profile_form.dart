@@ -24,7 +24,9 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _bioController;
-  File? avatar;
+  late String? avatar;
+  late File selectedAvatar;
+  bool avatarSelectorMode = false;
 
   @override
   void initState() {
@@ -41,23 +43,26 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
       if (image == null) return;
 
       setState(() {
-        avatar = File(image.path);
+        avatarSelectorMode = true;
+        selectedAvatar = File(image.path);
       });
     } on Exception catch (e) {
       print('Failed to pick image: $e');
     }
   }
 
-  File? _getImage() {
-    return avatar;
+  ImageProvider? _getImage() {
+    if (avatarSelectorMode) {
+      return FileImage(selectedAvatar);
+    } else if (avatar != null) {
+      return NetworkImage(avatar!);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final userState = context.read<AuthBloc>().state.user;
-    // var tempAvatar = userState?.avatar;
-    // print(tempAvatar);
-    // if (tempAvatar != null) avatar = File(tempAvatar.split('/').last);
+    avatar = userState?.avatar;
 
     return Form(
       child: Container(
@@ -131,7 +136,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
                   'name': _nameController.text,
                   'email': _emailController.text,
                   'bio': _bioController.text,
-                  'avatar': avatar?.path
+                  'avatar': avatarSelectorMode? selectedAvatar.path : avatar
                 };
                 final cubit = context.read<SigninCubit>();
                 await cubit.updateProfile(reponse);

@@ -24,11 +24,11 @@ class Avatar extends StatelessWidget {
             backgroundColor: Colors.white.withOpacity(0.2),
             child: ClipOval(
                 child: avatar != null
-                    ? Image.file(
-                        avatar!,
-                        height: 500,
-                        width: 500,
-                        fit: BoxFit.contain,
+                    ? Image(
+                        image: avatar,
+                        width: 180,
+                        height: 180,
+                        fit: BoxFit.fill,
                       )
                     : const Icon(
                         Icons.person,
