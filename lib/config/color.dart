@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+const primaryColor = Colors.lightGreen;
+const primaryVariantColor = Colors.teal;
+
 const List<Color> defaultGradients = [
-  Colors.teal,
-  Colors.lightGreen,
+  primaryVariantColor,
+  primaryColor,
   Colors.lime,
 ];
 

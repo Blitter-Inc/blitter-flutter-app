@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
 import './ui.dart';
 
@@ -20,28 +21,14 @@ class BlitterApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Blitter',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-      ),
-      darkTheme: ThemeData(
-        scaffoldBackgroundColor: Colors.black,
-        primarySwatch: Colors.lightGreen,
-        colorScheme: const ColorScheme.dark(
-          primary: Colors.lightGreen,
-          primaryVariant: Colors.teal,
-        ),
-        snackBarTheme: const SnackBarThemeData(
-          contentTextStyle: TextStyle(
-            color: Colors.black,
-          ),
-          backgroundColor: Colors.lightGreen,
-        ),
-      ),
+      theme: lightThemeData,
+      darkTheme: darkThemeData,
       themeMode: ThemeMode.dark,
       initialRoute: isLoggedIn ? DashboardScreen.route : SigninScreen.route,
       routes: {
         SigninScreen.route: (_) => const SigninScreen(),
         DashboardScreen.route: (_) => const DashboardScreen(),
+        BillManagerScreen.route: (_) => const BillManagerScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
+import 'package:blitter_flutter_app/ui.dart';
 import 'package:blitter_flutter_app/ui/shared.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -60,7 +61,12 @@ class DashboardScreen extends StatelessWidget {
                   const SizedBox(height: 30),
                   OutlinedButton(
                     child: const Text('Bill Manager Screen'),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        BillManagerScreen.route,
+                      );
+                    },
                   ),
                   const SizedBox(height: 10),
                   OutlinedButton(
