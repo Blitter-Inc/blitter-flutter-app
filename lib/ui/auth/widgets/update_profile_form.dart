@@ -1,9 +1,15 @@
+// ignore_for_file: unused_local_variable
+
+import 'dart:io';
+import 'package:blitter_flutter_app/data/types.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
 import 'package:blitter_flutter_app/ui.dart';
+import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/ui/shared.dart';
 import './avatar.dart';
 
@@ -18,6 +24,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _bioController;
+  late File? avatar;
 
   @override
   void initState() {
@@ -27,9 +34,30 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
     super.initState();
   }
 
+  Future _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    try {
+      final image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      setState(() {
+        avatar = File(image.path);
+      });
+    } on Exception catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  File? _getImage() {
+    return avatar;
+  }
+
   @override
   Widget build(BuildContext context) {
     final userState = context.read<AuthBloc>().state.user;
+    var tempAvatar = userState?.avatar;
+    print(tempAvatar);
+    if (tempAvatar != null) avatar = File(tempAvatar.split('/')[-1]);
 
     return Form(
       child: Container(
@@ -38,7 +66,10 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 25),
-            const Avatar(),
+            Avatar(
+              getImage: _getImage,
+              pickImage: _pickImage,
+            ),
             const SizedBox(height: 45),
             TranslucentTextFormFieldContainer(
               paddingHorizontal: 5,
@@ -93,9 +124,17 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
             const SizedBox(height: 30),
             GradientButton(
               title: ' Submit ',
-              onPressed: () {
+              onPressed: () async {
                 context.read<APIRepository>().authState =
                     context.read<AuthBloc>().state;
+                final JsonMap reponse = {
+                  'name': _nameController.text,
+                  'email': _emailController.text,
+                  'bio': _bioController.text,
+                  'avatar': avatar?.path
+                };
+                final cubit = context.read<SigninCubit>();
+                await cubit.updateProfile(reponse);
                 Navigator.of(context).popAndPushNamed(DashboardScreen.route);
               },
             ),

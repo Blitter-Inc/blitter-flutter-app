@@ -29,8 +29,6 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName = context.read<AuthBloc>().state.user?.name ?? 'NULL';
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -53,9 +51,16 @@ class DashboardScreen extends StatelessWidget {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Welcome $userName\n\nPress the following buttons to naviate to screens',
-                    textAlign: TextAlign.center,
+                  BlocBuilder<AuthBloc, AuthState>(
+                    buildWhen: (previous, current) {
+                      return previous.user?.name != current.user?.name;
+                    },
+                    builder: (context, state) {
+                      return Text(
+                        'Welcome ${state.user?.name}\n\nPress the following buttons to naviate to screens',
+                        textAlign: TextAlign.center,
+                      );
+                    },
                   ),
                   const SizedBox(height: 30),
                   OutlinedButton(

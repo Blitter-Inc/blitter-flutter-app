@@ -1,10 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Avatar extends StatelessWidget {
-  const Avatar({Key? key}) : super(key: key);
+  final ValueGetter getImage;
+  final AsyncCallback pickImage;
+
+  const Avatar({
+    Key? key,
+    required this.pickImage,
+    required this.getImage,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final avatar = getImage();
+
     return InkWell(
       child: Stack(
         children: [
@@ -12,10 +22,18 @@ class Avatar extends StatelessWidget {
             radius: 90,
             foregroundColor: Colors.black.withOpacity(0.9),
             backgroundColor: Colors.white.withOpacity(0.2),
-            child: const Icon(
-              Icons.person,
-              size: 135,
-            ),
+            child: ClipOval(
+                child: avatar != null
+                    ? Image.file(
+                        avatar!,
+                        height: 500,
+                        width: 500,
+                        fit: BoxFit.contain,
+                      )
+                    : const Icon(
+                        Icons.person,
+                        size: 135,
+                      )),
           ),
           const Positioned(
             child: CircleAvatar(
@@ -32,7 +50,7 @@ class Avatar extends StatelessWidget {
           )
         ],
       ),
-      onTap: () {},
+      onTap: () => pickImage(),
     );
   }
 }

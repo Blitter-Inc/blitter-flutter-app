@@ -62,15 +62,17 @@ class APIRepository extends IAPIRepository {
 
   @override
   Future<http.StreamedResponse> updateProfile(JsonMap payload) async {
-    var request =
-        http.MultipartRequest('POST', ApiURI.updateBill(payload['id']))
-          ..files.add(await http.MultipartFile.fromPath(
-            'avatar',
-            payload['avatar'],
-            filename: payload['id'],
-          ));
+    var request = http.MultipartRequest('PATCH', ApiURI.updateUser())
+      ..headers.addAll(_getAuthHeaders());
+    if (payload['avatar'] != null) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'avatar',
+        payload['avatar'],
+        filename: payload['id'],
+      ));
+    }
     payload.forEach((key, value) {
-      if (key != 'id' || key != 'avatar') {
+      if (key != 'id' && key != 'avatar') {
         request.fields[key] = value;
       }
     });
