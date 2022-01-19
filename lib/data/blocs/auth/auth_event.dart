@@ -22,4 +22,13 @@ class UserLoggedIn extends AuthEvent {
         user = User.fromJson(json['user']);
 }
 
-// class UserProfileUpdated {}
+class UserProfileUpdated extends AuthEvent {
+  final User user;
+
+  UserProfileUpdated({
+    required this.user,
+  });
+
+  UserProfileUpdated.fromJson(Map<String, dynamic> json)
+      : user = User.fromJson(json);
+}

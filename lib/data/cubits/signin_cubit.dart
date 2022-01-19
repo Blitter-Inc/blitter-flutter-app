@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 import 'dart:convert';
+import 'package:blitter_flutter_app/data/types.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -139,5 +140,13 @@ class SigninCubit extends Cubit<SigninState> {
         ),
       );
     }
+  }
+
+   Future<void> updateProfile(JsonMap profileData) async {
+    final apiRes = await apiRepository.updateProfile(profileData);
+    final apiResBody = apiSerializerRepository.updateProfileResponseSerializer(
+        jsonDecode(await apiRes.stream.bytesToString()));
+        
+    authBloc.add(UserProfileUpdated.fromJson(apiResBody));
   }
 }
