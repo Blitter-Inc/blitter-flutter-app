@@ -24,7 +24,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _bioController;
-  late File? avatar;
+  File? avatar;
 
   @override
   void initState() {
@@ -55,9 +55,9 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
   @override
   Widget build(BuildContext context) {
     final userState = context.read<AuthBloc>().state.user;
-    var tempAvatar = userState?.avatar;
-    print(tempAvatar);
-    if (tempAvatar != null) avatar = File(tempAvatar.split('/')[-1]);
+    // var tempAvatar = userState?.avatar;
+    // print(tempAvatar);
+    // if (tempAvatar != null) avatar = File(tempAvatar.split('/').last);
 
     return Form(
       child: Container(
