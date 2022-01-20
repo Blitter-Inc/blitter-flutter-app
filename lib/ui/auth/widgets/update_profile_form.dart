@@ -1,15 +1,13 @@
-// ignore_for_file: unused_local_variable
-
 import 'dart:io';
-import 'package:blitter_flutter_app/data/types.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
-import 'package:blitter_flutter_app/data/repositories.dart';
-import 'package:blitter_flutter_app/ui.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
+import 'package:blitter_flutter_app/data/repositories.dart';
+import 'package:blitter_flutter_app/data/types.dart';
+import 'package:blitter_flutter_app/ui.dart';
 import 'package:blitter_flutter_app/ui/shared.dart';
 import './avatar.dart';
 
@@ -41,7 +39,6 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
     try {
       final image = await _picker.pickImage(source: ImageSource.gallery);
       if (image == null) return;
-
       setState(() {
         avatarSelectorMode = true;
         selectedAvatar = File(image.path);
@@ -132,14 +129,16 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
               onPressed: () async {
                 context.read<APIRepository>().authState =
                     context.read<AuthBloc>().state;
-                final JsonMap reponse = {
+                final JsonMap payload = {
                   'name': _nameController.text,
                   'email': _emailController.text,
                   'bio': _bioController.text,
-                  'avatar': avatarSelectorMode? selectedAvatar.path : avatar
                 };
+                if (avatarSelectorMode) {
+                  payload['avatar'] = selectedAvatar.path;
+                }
                 final cubit = context.read<SigninCubit>();
-                await cubit.updateProfile(reponse);
+                await cubit.updateProfile(payload);
                 Navigator.of(context).popAndPushNamed(DashboardScreen.route);
               },
             ),
