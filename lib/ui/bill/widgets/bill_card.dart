@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/models.dart' show Bill;
@@ -99,7 +100,7 @@ class BillCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     Text(
-                      'Updated: ${bill.lastUpdatedAt}',
+                      'Updated: ${context.getBillLastUpdatedAt(bill.lastUpdatedAt)}',
                       style: subtextStyle,
                     ),
                   ],
@@ -115,4 +116,15 @@ class BillCard extends StatelessWidget {
 
 extension on BuildContext {
   BorderRadius get billCardBorderRadius => BorderRadius.circular(8);
+
+  String getBillLastUpdatedAt(String dateTimeString) {
+    final dateTime = DateTime.parse(dateTimeString);
+    final currentDateTime = DateTime.now();
+    final midnight = DateTime(currentDateTime.year, currentDateTime.month,
+        currentDateTime.day, 0, 0, 0);
+    if (dateTime.isAfter(midnight)) {
+      return DateFormat.Hm().format(dateTime);
+    }
+    return DateFormat('MMM d,').add_Hm().format(dateTime);
+  }
 }
