@@ -36,9 +36,9 @@ class BlitterApp extends StatelessWidget {
         BillManagerScreen.route: (ctx) {
           final themeData = Theme.of(ctx);
           return Theme(
-            data: themeData.copyWith(
-              colorScheme: themeData.colorScheme
-                  .copyWith(primary: BillContext(ctx).primaryColor),
+            data: generateModuleThemeData(
+              defaultThemeData: themeData,
+              modulePrimaryColor: BillContext(ctx).primaryColor,
             ),
             child: const BillManagerScreen(),
           );

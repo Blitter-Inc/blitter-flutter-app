@@ -56,7 +56,7 @@ class BillModal extends StatelessWidget {
               bottom: 0,
               child: Container(
                 height: 100,
-                color: Theme.of(context).colorScheme.cardBackground,
+                color: Theme.of(context).colorScheme.bottomSheetModalBackground,
                 width: mediaQuery.size.width,
                 child: Column(
                   children: const [

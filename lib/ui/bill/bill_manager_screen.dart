@@ -11,25 +11,29 @@ class BillManagerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: colorScheme.primary,
         title: const Text(
           'Bill Manager',
           style: TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.search),
+          )
+        ],
       ),
       body: Column(
         children: [
           const SizedBox(
-            height: 60,
-            child: Center(
-              child: Text('ActionBar goes here'),
-            ),
+            height: 20,
+            // height: 60,
+            // child: Center(
+            //   child: Text('ActionBar goes here'),
+            // ),
           ),
           Expanded(
             child: BlocBuilder<BillBloc, BillState>(
