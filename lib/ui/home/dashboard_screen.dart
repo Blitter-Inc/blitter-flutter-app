@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
+import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/ui.dart';
 import 'package:blitter_flutter_app/ui/shared.dart';
 
@@ -56,7 +57,7 @@ class DashboardScreen extends StatelessWidget {
                     },
                     builder: (context, state) {
                       return Text(
-                        'Welcome ${state.user?.name}\n\nPress the following buttons to naviate to screens',
+                        'Welcome ${state.user?.name}\n\nPress the following buttons to test implemented functionalities of the app',
                         textAlign: TextAlign.center,
                       );
                     },
@@ -73,13 +74,13 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   OutlinedButton(
-                    child: const Text('Event Organiser Screen'),
-                    onPressed: () {},
+                    child: const Text('Toggle Theme Mode'),
+                    onPressed: context.switchThemeMode,
                   ),
                   const SizedBox(height: 10),
                   OutlinedButton(
-                    child: const Text('Expense Tracker Screen'),
-                    onPressed: () {},
+                    child: const Text('Open Color Picker'),
+                    onPressed: context.showColorPickerSheet,
                   ),
                 ],
               );

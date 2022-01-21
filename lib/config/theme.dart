@@ -1,26 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:blitter_flutter_app/data/blocs.dart';
+import 'package:blitter_flutter_app/ui/shared.dart';
 import './color.dart';
 
 final lightColorPalette = LightThemeColorPalette();
 final darkColorPalette = DarkThemeColorPalette();
 
-final lightThemeData = generateThemeDataFromPalette(
-  themeData: ThemeData.light(),
-  colorScheme: const ColorScheme.light(),
-  palette: lightColorPalette,
-);
-
-final darkThemeData = generateThemeDataFromPalette(
-  themeData: ThemeData.dark(),
-  colorScheme: const ColorScheme.dark(),
-  palette: darkColorPalette,
-);
-
 ThemeData generateThemeDataFromPalette({
   required ThemeData themeData,
   required ColorScheme colorScheme,
   required ThemeColorPalette palette,
+  required Color primary,
 }) {
   return themeData.copyWith(
     snackBarTheme: SnackBarThemeData(
@@ -30,8 +22,7 @@ ThemeData generateThemeDataFromPalette({
       backgroundColor: palette.snackBarBackgroundColor,
     ),
     colorScheme: colorScheme.copyWith(
-      primary: primaryColor,
-      primaryVariant: primaryVariantColor,
+      primary: primary,
     ),
     scaffoldBackgroundColor: palette.scaffoldBackgroundColor,
     cardColor: palette.cardColor,
@@ -55,7 +46,7 @@ ThemeData generateModuleThemeData({
       primary: modulePrimaryColor,
     ),
     appBarTheme: defaultThemeData.appBarTheme.copyWith(
-      foregroundColor: primaryColor,
+      foregroundColor: modulePrimaryColor,
     ),
     snackBarTheme: defaultThemeData.snackBarTheme.copyWith(
       backgroundColor: modulePrimaryColor,
@@ -83,4 +74,20 @@ extension CustomColorScheme on ColorScheme {
   Color get cupertinoPickerItemText => _darkThemeEnabled
       ? darkColorPalette.cupertinoPickerItemTextColor
       : lightColorPalette.cupertinoPickerItemTextColor;
+}
+
+extension CustomBuildContext on BuildContext {
+  void switchThemeMode() {
+    final configBloc = read<ConfigBloc>();
+    configBloc.add(SwitchThemeMode());
+  }
+
+  void showColorPickerSheet() {
+    showModalBottomSheet(
+      context: this,
+      barrierColor: Colors.black87,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const ColorPickerSheet(),
+    );
+  }
 }

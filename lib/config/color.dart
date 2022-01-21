@@ -93,7 +93,6 @@ class DarkThemeColorPalette implements ThemeColorPalette {
       const Color.fromRGBO(200, 200, 200, 1);
 }
 
-extension BillContext on BuildContext {
-  Color get primaryColor => Colors.lightGreen;
-  Color get primaryVarientColor => Colors.lightGreen.shade400;
+class ModuleColorPalette {
+  static const bill = primaryColor;
 }

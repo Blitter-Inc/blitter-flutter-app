@@ -19,32 +19,52 @@ class BlitterApp extends StatelessWidget {
 
     final isLoggedIn = authBloc.state.user != null;
 
-    return MaterialApp(
-      title: 'Blitter',
-      theme: lightThemeData,
-      darkTheme: darkThemeData,
-      themeMode: ThemeMode.system,
-      initialRoute: isLoggedIn ? DashboardScreen.route : SigninScreen.route,
-      routes: {
-        SigninScreen.route: (_) {
-          return Theme(
-            data: darkThemeData,
-            child: const SigninScreen(),
-          );
-        },
-        DashboardScreen.route: (_) => const DashboardScreen(),
-        BillManagerScreen.route: (ctx) {
-          final themeData = Theme.of(ctx);
-          return Theme(
-            data: generateModuleThemeData(
-              defaultThemeData: themeData,
-              modulePrimaryColor: BillContext(ctx).primaryColor,
-            ),
-            child: const BillManagerScreen(),
-          );
-        },
+    return BlocBuilder<ConfigBloc, ConfigState>(
+      builder: (context, state) {
+        final lightThemeData = generateThemeDataFromPalette(
+          themeData: ThemeData.light(),
+          colorScheme: const ColorScheme.light(),
+          palette: lightColorPalette,
+          primary: state.primaryColor,
+        );
+        final darkThemeData = generateThemeDataFromPalette(
+          themeData: ThemeData.dark(),
+          colorScheme: const ColorScheme.dark(),
+          palette: darkColorPalette,
+          primary: state.primaryColor,
+        );
+        return MaterialApp(
+          title: 'Blitter',
+          theme: lightThemeData,
+          darkTheme: darkThemeData,
+          themeMode: state.darkModeEnabled ? ThemeMode.dark : ThemeMode.light,
+          initialRoute: isLoggedIn ? DashboardScreen.route : SigninScreen.route,
+          routes: {
+            SigninScreen.route: (_) {
+              return Theme(
+                data: darkThemeData,
+                child: const SigninScreen(),
+              );
+            },
+            DashboardScreen.route: (_) => const DashboardScreen(),
+            BillManagerScreen.route: (ctx) {
+              final themeData = Theme.of(ctx);
+              return BlocBuilder<ConfigBloc, ConfigState>(
+                builder: (context, state) {
+                  return Theme(
+                    data: generateModuleThemeData(
+                      defaultThemeData: themeData,
+                      modulePrimaryColor: state.billPrimaryColor,
+                    ),
+                    child: const BillManagerScreen(),
+                  );
+                },
+              );
+            },
+          },
+          debugShowCheckedModeBanner: false,
+        );
       },
-      debugShowCheckedModeBanner: false,
     );
   }
 }
