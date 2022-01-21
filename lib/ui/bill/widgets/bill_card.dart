@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/models.dart' show Bill;
+import './bill_modal.dart';
 
 class BillCard extends StatelessWidget {
   final Bill bill;
@@ -16,7 +17,7 @@ class BillCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final subtextStyle = TextStyle(
-      color: colorScheme.billCardSubtext,
+      color: colorScheme.cardSubtext,
       fontSize: 11.5,
     );
 
@@ -33,7 +34,19 @@ class BillCard extends StatelessWidget {
         shadowColor: Colors.grey.shade600,
         child: InkWell(
           borderRadius: context.billCardBorderRadius,
-          onTap: () {},
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (context) => const BillModal(),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(10),
+                ),
+              ),
+              barrierColor: Colors.black87,
+              isScrollControlled: true,
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             child: Column(
@@ -50,7 +63,7 @@ class BillCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(
-                              color: colorScheme.billCardText,
+                              color: colorScheme.cardText,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
@@ -63,7 +76,7 @@ class BillCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: colorScheme.billPrimaryColor,
+                              color: colorScheme.primary,
                             ),
                           ),
                         ],

@@ -23,12 +23,26 @@ class BlitterApp extends StatelessWidget {
       title: 'Blitter',
       theme: lightThemeData,
       darkTheme: darkThemeData,
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.system,
       initialRoute: isLoggedIn ? DashboardScreen.route : SigninScreen.route,
       routes: {
-        SigninScreen.route: (_) => const SigninScreen(),
+        SigninScreen.route: (_) {
+          return Theme(
+            data: darkThemeData,
+            child: const SigninScreen(),
+          );
+        },
         DashboardScreen.route: (_) => const DashboardScreen(),
-        BillManagerScreen.route: (_) => const BillManagerScreen(),
+        BillManagerScreen.route: (ctx) {
+          final themeData = Theme.of(ctx);
+          return Theme(
+            data: themeData.copyWith(
+              colorScheme: themeData.colorScheme
+                  .copyWith(primary: BillContext(ctx).primaryColor),
+            ),
+            child: const BillManagerScreen(),
+          );
+        },
       },
       debugShowCheckedModeBanner: false,
     );
