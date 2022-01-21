@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
 import './widgets/widgets.dart';
 
@@ -16,7 +15,7 @@ class BillManagerScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: colorScheme.billPrimaryColor,
+        backgroundColor: colorScheme.primary,
         title: const Text(
           'Bill Manager',
           style: TextStyle(

@@ -38,8 +38,6 @@ class DashboardScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
       ),
       body: Center(
         child: FutureBuilder<void>(
