@@ -1,44 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:blitter_flutter_app/data/blocs.dart';
+import 'package:blitter_flutter_app/ui/shared.dart';
 import './color.dart';
 
-final defaultLightThemeData = ThemeData.light();
-final defaultDarkThemeData = ThemeData.dark();
+final lightColorPalette = LightThemeColorPalette();
+final darkColorPalette = DarkThemeColorPalette();
 
-ThemeData lightThemeData = defaultLightThemeData.copyWith(
-  snackBarTheme: const SnackBarThemeData(
-    contentTextStyle: TextStyle(
-      color: Colors.black,
+ThemeData generateThemeDataFromPalette({
+  required ThemeData themeData,
+  required ColorScheme colorScheme,
+  required ThemeColorPalette palette,
+  required Color primary,
+}) {
+  return themeData.copyWith(
+    snackBarTheme: SnackBarThemeData(
+      contentTextStyle: TextStyle(
+        color: palette.snackBarContentTextColor,
+      ),
+      backgroundColor: palette.snackBarBackgroundColor,
     ),
-    backgroundColor: primaryColor,
-  ),
-  colorScheme: const ColorScheme.light(
-    primary: primaryColor,
-    primaryVariant: primaryVariantColor,
-  ),
-  cardColor: const Color.fromRGBO(215, 215, 215, 1),
-  bottomSheetTheme: defaultLightThemeData.bottomSheetTheme.copyWith(
-    modalBackgroundColor: const Color.fromRGBO(215, 215, 215, 1),
-  ),
-);
+    colorScheme: colorScheme.copyWith(
+      primary: primary,
+    ),
+    scaffoldBackgroundColor: palette.scaffoldBackgroundColor,
+    cardColor: palette.cardColor,
+    bottomSheetTheme: themeData.bottomSheetTheme.copyWith(
+      modalBackgroundColor: palette.bottomSheetModalBackgroundColor,
+    ),
+    appBarTheme: themeData.appBarTheme.copyWith(
+      elevation: 0,
+      foregroundColor: palette.appBarForegroundColor,
+      backgroundColor: palette.appBarBackgroundColor,
+    ),
+  );
+}
 
-ThemeData darkThemeData = defaultDarkThemeData.copyWith(
-  snackBarTheme: const SnackBarThemeData(
-    contentTextStyle: TextStyle(
-      color: Colors.black,
+ThemeData generateModuleThemeData({
+  required ThemeData defaultThemeData,
+  required Color modulePrimaryColor,
+}) {
+  return defaultThemeData.copyWith(
+    colorScheme: defaultThemeData.colorScheme.copyWith(
+      primary: modulePrimaryColor,
     ),
-    backgroundColor: primaryColor,
-  ),
-  colorScheme: const ColorScheme.dark(
-    primary: primaryColor,
-    primaryVariant: primaryVariantColor,
-  ),
-  scaffoldBackgroundColor: Colors.black,
-  cardColor: const Color.fromRGBO(30, 30, 30, 1),
-  bottomSheetTheme: defaultDarkThemeData.bottomSheetTheme.copyWith(
-    modalBackgroundColor: const Color.fromRGBO(30, 30, 30, 1),
-  ),
-);
+    appBarTheme: defaultThemeData.appBarTheme.copyWith(
+      foregroundColor: modulePrimaryColor,
+    ),
+    snackBarTheme: defaultThemeData.snackBarTheme.copyWith(
+      backgroundColor: modulePrimaryColor,
+    ),
+  );
+}
 
 extension CustomColorScheme on ColorScheme {
   // ColorScheme get object => this;
@@ -46,20 +60,34 @@ extension CustomColorScheme on ColorScheme {
   bool get _darkThemeEnabled => brightness == Brightness.dark;
 
   Color get cardText => _darkThemeEnabled
-      ? const Color.fromRGBO(200, 200, 200, 1)
-      : const Color.fromRGBO(55, 55, 55, 1);
+      ? darkColorPalette.cardTextColor
+      : lightColorPalette.cardTextColor;
 
-  Color get cardSubtext => _darkThemeEnabled ? Colors.white60 : Colors.black54;
+  Color get cardSubtext => _darkThemeEnabled
+      ? darkColorPalette.cardSubtextColor
+      : lightColorPalette.cardSubtextColor;
 
-  Color get cardBackground => _darkThemeEnabled
-      ? const Color.fromRGBO(30, 30, 30, 1)
-      : const Color.fromRGBO(215, 215, 215, 1);
+  Color get bottomSheetModalBackground => _darkThemeEnabled
+      ? darkColorPalette.bottomSheetModalBackgroundColor
+      : lightColorPalette.bottomSheetModalBackgroundColor;
 
   Color get cupertinoPickerItemText => _darkThemeEnabled
-      ? const Color.fromRGBO(200, 200, 200, 1)
-      : const Color.fromRGBO(55, 55, 55, 1);
+      ? darkColorPalette.cupertinoPickerItemTextColor
+      : lightColorPalette.cupertinoPickerItemTextColor;
 }
 
-extension BillContext on BuildContext {
-  Color get primaryColor => Colors.indigoAccent;
+extension CustomBuildContext on BuildContext {
+  void switchThemeMode() {
+    final configBloc = read<ConfigBloc>();
+    configBloc.add(SwitchThemeMode());
+  }
+
+  void showColorPickerSheet() {
+    showModalBottomSheet(
+      context: this,
+      barrierColor: Colors.black87,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const ColorPickerSheet(),
+    );
+  }
 }

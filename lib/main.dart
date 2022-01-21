@@ -37,6 +37,10 @@ void main() async {
         ],
         child: MultiBlocProvider(
           providers: [
+            BlocProvider<ConfigBloc>(
+              create: (_) => ConfigBloc(),
+              lazy: false,
+            ),
             BlocProvider<AuthBloc>(
               create: (_) => AuthBloc(),
               lazy: false,
