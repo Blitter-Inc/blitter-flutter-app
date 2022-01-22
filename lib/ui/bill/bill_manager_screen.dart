@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:blitter_flutter_app/config.dart';
+import 'package:blitter_flutter_app/extensions.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
 import './widgets/widgets.dart';
 
@@ -34,7 +34,6 @@ class BillManagerScreen extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              // configBloc.add(SwitchThemeMode());
               context.switchThemeMode();
             },
           ),

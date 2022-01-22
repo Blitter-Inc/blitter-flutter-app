@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:blitter_flutter_app/config.dart';
+import 'package:blitter_flutter_app/extensions.dart';
 import 'package:blitter_flutter_app/data/models.dart' show Bill;
 import './bill_modal.dart';
 

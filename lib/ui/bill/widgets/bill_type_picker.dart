@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:blitter_flutter_app/config.dart';
+import 'package:blitter_flutter_app/extensions.dart';
 
 class BillTypePicker extends StatelessWidget {
   static const billTypes = [

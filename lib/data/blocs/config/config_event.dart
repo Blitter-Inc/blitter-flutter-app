@@ -15,3 +15,5 @@ class SetBillPrimaryColor extends ConfigEvent {
 
   SetBillPrimaryColor(this.color);
 }
+
+class ResetConfigBloc extends ConfigEvent {}

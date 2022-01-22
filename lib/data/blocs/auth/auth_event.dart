@@ -32,3 +32,5 @@ class UserProfileUpdated extends AuthEvent {
   UserProfileUpdated.fromJson(Map<String, dynamic> json)
       : user = User.fromJson(json);
 }
+
+class ResetAuthBloc extends AuthEvent {}
