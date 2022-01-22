@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:blitter_flutter_app/data/cubits.dart';
 
 class BillNameInput extends StatelessWidget {
   const BillNameInput({Key? key}) : super(key: key);
@@ -6,8 +9,11 @@ class BillNameInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final cubit = context.read<BillManagerCubit>();
+    final state = cubit.state.billModalState!;
 
     return TextFormField(
+      initialValue: state.name,
       textCapitalization: TextCapitalization.sentences,
       decoration: const InputDecoration(
         labelText: 'Enter bill name',

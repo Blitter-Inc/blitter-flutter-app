@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/extensions.dart';
 import './amount_input.dart';
 import './description_input.dart';
@@ -16,6 +18,8 @@ class BillModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final cubit = context.read<BillManagerCubit>();
+    final state = cubit.state.billModalState!;
 
     return Container(
       padding: EdgeInsets.only(

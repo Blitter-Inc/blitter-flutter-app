@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/extensions.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
+import 'package:blitter_flutter_app/data/cubits.dart';
 import './widgets/widgets.dart';
 
 class BillManagerScreen extends StatelessWidget {
@@ -12,67 +13,70 @@ class BillManagerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Bill Manager',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+    return BlocProvider(
+      create: (context) => BillManagerCubit(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Bill Manager',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
+          actions: [
+            IconButton(
+              onPressed: context.showColorPickerSheet,
+              icon: const Icon(Icons.color_lens),
+            ),
+            IconButton(
+              icon: BlocBuilder<ConfigBloc, ConfigState>(
+                buildWhen: (previous, current) =>
+                    previous.darkModeEnabled != current.darkModeEnabled,
+                builder: (_, state) => Icon(
+                  state.darkModeEnabled ? Icons.mode_night : Icons.wb_sunny,
+                ),
+              ),
+              onPressed: () {
+                context.switchThemeMode();
+              },
+            ),
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.search),
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            onPressed: context.showColorPickerSheet,
-            icon: const Icon(Icons.color_lens),
-          ),
-          IconButton(
-            icon: BlocBuilder<ConfigBloc, ConfigState>(
-              buildWhen: (previous, current) =>
-                  previous.darkModeEnabled != current.darkModeEnabled,
-              builder: (_, state) => Icon(
-                state.darkModeEnabled ? Icons.mode_night : Icons.wb_sunny,
+        body: Column(
+          children: [
+            const SizedBox(
+              height: 20,
+              // height: 60,
+              // child: Center(
+              //   child: Text('ActionBar goes here'),
+              // ),
+            ),
+            Expanded(
+              child: BlocBuilder<BillBloc, BillState>(
+                buildWhen: (previous, current) {
+                  return previous.lastRefreshed != current.lastRefreshed;
+                },
+                builder: (context, state) {
+                  return ListView.builder(
+                    itemBuilder: (context, index) {
+                      final bill = state.objectMap![
+                          state.orderedSequence![index].toString()]!;
+                      return BillCard(
+                        key: ValueKey(index),
+                        bill: bill,
+                      );
+                    },
+                    itemCount: state.inStateCount,
+                  );
+                },
               ),
             ),
-            onPressed: () {
-              context.switchThemeMode();
-            },
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 20,
-            // height: 60,
-            // child: Center(
-            //   child: Text('ActionBar goes here'),
-            // ),
-          ),
-          Expanded(
-            child: BlocBuilder<BillBloc, BillState>(
-              buildWhen: (previous, current) {
-                return previous.lastRefreshed != current.lastRefreshed;
-              },
-              builder: (context, state) {
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    final bill = state
-                        .objectMap![state.orderedSequence![index].toString()]!;
-                    return BillCard(
-                      key: ValueKey(index),
-                      bill: bill,
-                    );
-                  },
-                  itemCount: state.inStateCount,
-                );
-              },
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
