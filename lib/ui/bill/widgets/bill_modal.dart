@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:blitter_flutter_app/config.dart';
+import 'package:blitter_flutter_app/extensions.dart';
 import './amount_input.dart';
 import './description_input.dart';
 import './bottom_modal_submit_button.dart';

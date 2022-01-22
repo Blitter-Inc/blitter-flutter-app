@@ -15,3 +15,5 @@ class InitializeBillState extends BillEvent {
           objectMap: json['objectMap']!,
         );
 }
+
+class ResetBillBloc extends BillEvent {}

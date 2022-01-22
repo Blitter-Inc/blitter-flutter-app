@@ -9,6 +9,7 @@ class BillBloc extends HydratedBloc<BillEvent, BillState> {
     on<InitializeBillState>((event, emit) {
       emit(event.stateObj);
     });
+    on<ResetBillBloc>((_, emit) => emit(BillState()));
   }
 
   @override

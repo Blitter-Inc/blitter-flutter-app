@@ -14,8 +14,10 @@ class BlitterApp extends StatelessWidget {
 
     // uncomment the following lines to clear storage
     // final billBloc = context.read<BillBloc>();
+    // final configBloc = context.read<ConfigBloc>();
     // authBloc.clear();
     // billBloc.clear();
+    // configBloc.clear();
 
     final isLoggedIn = authBloc.state.user != null;
 
@@ -24,13 +26,13 @@ class BlitterApp extends StatelessWidget {
         final lightThemeData = generateThemeDataFromPalette(
           themeData: ThemeData.light(),
           colorScheme: const ColorScheme.light(),
-          palette: lightColorPalette,
+          palette: LightThemeColorPalette(),
           primary: state.primaryColor,
         );
         final darkThemeData = generateThemeDataFromPalette(
           themeData: ThemeData.dark(),
           colorScheme: const ColorScheme.dark(),
-          palette: darkColorPalette,
+          palette: DarkThemeColorPalette(),
           primary: state.primaryColor,
         );
         return MaterialApp(

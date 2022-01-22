@@ -24,6 +24,7 @@ class ConfigBloc extends HydratedBloc<ConfigEvent, ConfigState> {
         state.copyWith(billPrimaryColor: event.color),
       ),
     );
+    on<ResetConfigBloc>((_, emit) => emit(const ConfigState()));
   }
 
   @override

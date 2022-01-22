@@ -20,6 +20,8 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
     on<UserProfileUpdated>((event, emit) {
       emit(state.copyWith(user: event.user));
     });
+
+    on<ResetAuthBloc>((_, emit) => emit(AuthState()));
   }
 
   @override
