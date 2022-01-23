@@ -38,7 +38,7 @@ class APISerializerRepository {
   }
 
   JsonMap fetchUserProfilesResponseSerializer(JsonMap body) {
-    return body.map((key, value) => MapEntry(key, _generateUserObject(value)));
+    return body.map((key, value) => MapEntry<String, User>(key, User.fromAPIJson(value)));
   }
 
   JsonMap fetchBillsResponseSerializer(JsonMap body) {

@@ -26,6 +26,15 @@ class User {
         avatar = json['avatar'],
         bio = json['bio'];
 
+  User.fromAPIJson(Map<String, dynamic> json)
+      : id = json['id'],
+        name = json['name'],
+        email = json['email'],
+        avatar = json['avatar'],
+        bio = json['bio'],
+        phoneNumber = json['phone'],
+        dateJoined = json['date_joined'];
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'phoneNumber': phoneNumber,
