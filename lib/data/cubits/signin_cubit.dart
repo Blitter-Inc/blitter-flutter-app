@@ -152,7 +152,7 @@ class SigninCubit extends Cubit<SigninState> {
 
     for (var contact in contacts) {
       contact.phones?.forEach((numberObj) {
-        var number = numberObj.value?.replaceAll(RegExp('/-|\s|(|)/g'), "");
+        var number = numberObj.value?.replaceAll(RegExp('/-|\\s|(|)/g'), "");
         if (number != null) {
           if (number.startsWith("0751") ||
               number.startsWith('+') && !number.startsWith('+91')) {
@@ -169,7 +169,6 @@ class SigninCubit extends Cubit<SigninState> {
         }
       });
     }
-
     final phoneNumberList = phoneNumber.toList();
     final apiRes = await apiRepository.fetchUserProfiles(apiSerializerRepository
         .fetchUserProfilesRequestSerializer(phoneNumberList));

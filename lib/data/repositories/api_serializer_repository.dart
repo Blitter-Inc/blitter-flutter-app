@@ -37,8 +37,9 @@ class APISerializerRepository {
     return {'phone_numbers': payload};
   }
 
-  JsonMap fetchUserProfilesResponseSerializer(JsonMap body) {
-    return body.map((key, value) => MapEntry<String, User>(key, User.fromAPIJson(value)));
+  Map<String, User> fetchUserProfilesResponseSerializer(JsonMap body) {
+    return body.map(
+        (key, value) => MapEntry<String, User>(key, User.fromAPIJson(value)));
   }
 
   JsonMap fetchBillsResponseSerializer(JsonMap body) {
@@ -48,8 +49,8 @@ class APISerializerRepository {
       'hasNext': body['next'] != null,
       'ordering': body['ordering'],
       'orderedSequence': (body['ordered_sequence'] as List).cast<int>(),
-      'objectMap': (body['object_map'] as Map)
-          .map((key, value) => MapEntry<String, Bill>(key, Bill.fromAPIJson(value))),
+      'objectMap': (body['object_map'] as Map).map(
+          (key, value) => MapEntry<String, Bill>(key, Bill.fromAPIJson(value))),
     };
   }
 

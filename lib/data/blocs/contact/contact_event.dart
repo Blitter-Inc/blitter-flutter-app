@@ -1,4 +1,4 @@
-import 'package:blitter_flutter_app/data/types.dart';
+import 'package:blitter_flutter_app/data/models.dart';
 import './contact_state.dart';
 
 abstract class ContactEvent {}
@@ -6,9 +6,9 @@ abstract class ContactEvent {}
 class InitializeContactState extends ContactEvent {
   final ContactState stateObj;
 
-  InitializeContactState(JsonMap json)
+  InitializeContactState(Map<String, User> json)
       : stateObj = ContactState.fromFetchedData(
-          objectMap: json['objectMap']!,
+          objectMap: json,
         );
 }
 

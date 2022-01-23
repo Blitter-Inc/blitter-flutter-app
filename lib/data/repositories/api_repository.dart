@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:blitter_flutter_app/config.dart' show apiBaseUrl;
@@ -84,7 +85,8 @@ class APIRepository extends IAPIRepository {
   Future<http.Response> fetchUserProfiles(JsonMap payload) async {
     var response = await http.post(
       ApiURI.fetchUserProfiles(),
-      body: payload,
+      body: json.encode(payload),
+      headers: {..._getAuthHeaders(), 'Content-type': 'application/json'},
     );
     return response;
   }
