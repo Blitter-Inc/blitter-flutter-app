@@ -134,6 +134,7 @@ class _SigninScreenState extends State<SigninScreen>
       lazy: false,
       create: (_) => SigninCubit(
         authBloc: context.read<AuthBloc>(),
+        contactBloc: context.read<ContactBloc>(),
         apiRepository: context.read<APIRepository>(),
         apiSerializerRepository: context.read<APISerializerRepository>(),
         codeSentHandler: _codeSentHandler,

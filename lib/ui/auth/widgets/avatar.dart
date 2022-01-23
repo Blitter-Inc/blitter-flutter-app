@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 class Avatar extends StatelessWidget {
   final ValueGetter getImage;
   final AsyncCallback pickImage;
+  final String? name;
 
-  const Avatar({
-    Key? key,
-    required this.pickImage,
-    required this.getImage,
-  }) : super(key: key);
+  const Avatar(
+      {Key? key, required this.pickImage, required this.getImage, this.name})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +28,25 @@ class Avatar extends StatelessWidget {
                         width: 180,
                         height: 180,
                         fit: BoxFit.fill,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        },
+                        errorBuilder: (context, error, stackTrace) =>
+                            name != null
+                                ? CircleAvatar(
+                                    backgroundColor:
+                                        Colors.black54.withOpacity(0.7),
+                                    child: Text(name![0],
+                                        style: const TextStyle(
+                                          fontSize: 80,
+                                        )),
+                                    radius: 90,
+                                  )
+                                : const Icon(
+                                    Icons.person,
+                                    size: 135,
+                                  ),
                       )
                     : const Icon(
                         Icons.person,

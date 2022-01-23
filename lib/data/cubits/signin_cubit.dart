@@ -4,6 +4,8 @@ import 'package:blitter_flutter_app/data/types.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:blitter_flutter_app/data/exceptions.dart';
 import './signin_state.dart';
@@ -12,6 +14,7 @@ import '../repositories/repositories.dart';
 
 class SigninCubit extends Cubit<SigninState> {
   final AuthBloc authBloc;
+  final ContactBloc contactBloc;
   final APIRepository apiRepository;
   final APISerializerRepository apiSerializerRepository;
   final AsyncCallback codeSentHandler;
@@ -21,6 +24,7 @@ class SigninCubit extends Cubit<SigninState> {
 
   SigninCubit({
     required this.authBloc,
+    required this.contactBloc,
     required this.apiRepository,
     required this.apiSerializerRepository,
     required this.codeSentHandler,
@@ -142,11 +146,62 @@ class SigninCubit extends Cubit<SigninState> {
     }
   }
 
-   Future<void> updateProfile(JsonMap profileData) async {
+  Future _fetchContactsHandler() async {
+    if (await Permission.contacts.request().isGranted) {
+      List<Contact> contacts =
+          await ContactsService.getContacts(withThumbnails: false);
+      final phoneNumber = <String>{};
+
+      for (var contact in contacts) {
+        contact.phones?.forEach((numberObj) {
+          var number = numberObj.value?.replaceAll(RegExp('/-|\\s|(|)/g'), "");
+          if (number != null) {
+            if (number.startsWith("0751") ||
+                number.startsWith('+') && !number.startsWith('+91')) {
+              return;
+            } else if (number.startsWith('0') && number.length == 11) {
+              number = "+91" + number.substring(1);
+            } else if (number.length == 10) {
+              number = "+91" + number;
+            }
+
+            if (number.length == 13) {
+              phoneNumber.add(number);
+            }
+          }
+        });
+      }
+      final phoneNumberList = phoneNumber.toList();
+      return phoneNumberList;
+    } else {
+      return [];
+    }
+  }
+
+  Future<void> _syncContactsHandler() async {
+    final List<String> phoneNumberList;
+    if (Platform.isAndroid || Platform.isIOS) {
+      phoneNumberList = await _fetchContactsHandler();
+    } else {
+      phoneNumberList = ['+919643966069', '+918223909888'];
+    }
+
+    final apiRes = await apiRepository.fetchUserProfiles(apiSerializerRepository
+        .fetchUserProfilesRequestSerializer(phoneNumberList));
+    contactBloc.add(InitializeContactState(apiSerializerRepository
+        .fetchUserProfilesResponseSerializer(jsonDecode(apiRes.body))));
+  }
+
+  Future<void> _updateProfileHandler(JsonMap profileData) async {
     final apiRes = await apiRepository.updateProfile(profileData);
     final apiResBody = apiSerializerRepository.updateProfileResponseSerializer(
         jsonDecode(await apiRes.stream.bytesToString()));
-        
+
     authBloc.add(UserProfileUpdated.fromJson(apiResBody));
+  }
+
+  Future<void> initializeApp(JsonMap profileData) async {
+    await _updateProfileHandler(profileData);
+    await _syncContactsHandler();
   }
 }
