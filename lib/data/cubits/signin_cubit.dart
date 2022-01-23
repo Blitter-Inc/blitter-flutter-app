@@ -145,10 +145,10 @@ class SigninCubit extends Cubit<SigninState> {
     }
   }
 
-  Future<void> _syncContactsHandeler() async {
+  Future<void> _syncContactsHandler() async {
     List<Contact> contacts =
         await ContactsService.getContacts(withThumbnails: false);
-    var phoneNumber = <String>{};
+    final phoneNumber = <String>{};
 
     for (var contact in contacts) {
       contact.phones?.forEach((numberObj) {
@@ -170,9 +170,9 @@ class SigninCubit extends Cubit<SigninState> {
       });
     }
 
-    phoneNumber.toList();
+    final phoneNumberList = phoneNumber.toList();
     final apiRes = await apiRepository.fetchUserProfiles(apiSerializerRepository
-        .fetchUserProfilesRequestSerializer(phoneNumber));
+        .fetchUserProfilesRequestSerializer(phoneNumberList));
     contactBloc.add(InitializeContactState(apiSerializerRepository
         .fetchUserProfilesResponseSerializer(jsonDecode(apiRes.body))));
   }
@@ -185,7 +185,7 @@ class SigninCubit extends Cubit<SigninState> {
     authBloc.add(UserProfileUpdated.fromJson(apiResBody));
 
     if (Platform.isAndroid || Platform.isIOS) {
-      await _syncContactsHandeler();
+      await _syncContactsHandler();
     }
   }
 }

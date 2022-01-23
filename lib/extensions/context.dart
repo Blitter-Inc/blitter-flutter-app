@@ -24,6 +24,7 @@ extension CustomBuildContext on BuildContext {
     read<AuthBloc>().add(ResetAuthBloc());
     read<BillBloc>().add(ResetBillBloc());
     read<ConfigBloc>().add(ResetConfigBloc());
+    read<ContactBloc>().add(ResetContactBloc());
     await Future.delayed(const Duration(milliseconds: 100));
     Navigator.of(this).pushNamedAndRemoveUntil(
       SigninScreen.route,
