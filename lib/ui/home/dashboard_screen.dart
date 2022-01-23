@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
-import 'package:blitter_flutter_app/extensions.dart';
+import 'package:blitter_flutter_app/utils/extensions.dart';
 import 'package:blitter_flutter_app/ui.dart';
 import 'package:blitter_flutter_app/ui/shared.dart';
 

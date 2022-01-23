@@ -1,47 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:blitter_flutter_app/data/cubits.dart';
-import 'package:blitter_flutter_app/extensions.dart';
+import 'package:blitter_flutter_app/data/constants.dart';
+import 'package:blitter_flutter_app/utils/extensions.dart';
+import 'package:blitter_flutter_app/utils/debouncer.dart';
 
 class BillTypePicker extends StatelessWidget {
-  static const billTypes = [
-    '-----',
-    'Entertainment',
-    'Food',
-    'Shopping',
-    'Outing',
-    'Miscelleneous',
-  ];
+  BillTypePicker({
+    Key? key,
+    required this.onChanged,
+    this.initialValue = '',
+  }) : super(key: key);
 
-  static int getBillTypeIndex(String? type) {
-    switch (type) {
-      case 'entertainment':
-        return 1;
-      case 'food':
-        return 2;
-      case 'shopping':
-        return 3;
-      case 'outing':
-        return 4;
-      case 'miscelleneous':
-        return 5;
-      default:
-        return 0;
-    }
-  }
+  final String initialValue;
+  final ValueSetter<String> onChanged;
 
-  const BillTypePicker({Key? key}) : super(key: key);
+  final _debouncer = Debouncer(duration: const Duration(milliseconds: 350));
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final cubit = context.read<BillManagerCubit>();
-    final state = cubit.state.billModalState!;
+
     final _controller = FixedExtentScrollController(
-      initialItem: getBillTypeIndex(state.type),
+      initialItem: BillType.valueIndexMap[initialValue]!,
     );
 
     return SizedBox(
@@ -67,7 +49,7 @@ class BillTypePicker extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return Center(
                     child: Text(
-                      billTypes[index],
+                      BillType.displayValues[index],
                       style: TextStyle(
                         color: colorScheme.cupertinoPickerItemText,
                         fontSize: 16,
@@ -80,8 +62,9 @@ class BillTypePicker extends StatelessWidget {
                   HapticFeedback.vibrate();
                   SystemSound.play(SystemSoundType.alert);
                   SystemSound.play(SystemSoundType.click);
+                  _debouncer.run(() => onChanged(BillType.values[index]));
                 },
-                childCount: billTypes.length,
+                childCount: BillType.values.length,
               ),
             ),
           ),
