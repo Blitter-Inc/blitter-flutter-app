@@ -15,9 +15,11 @@ class BlitterApp extends StatelessWidget {
     // uncomment the following lines to clear storage
     // final billBloc = context.read<BillBloc>();
     // final configBloc = context.read<ConfigBloc>();
+    // final contactBloc = context.read<ContactBloc>();
     // authBloc.clear();
     // billBloc.clear();
     // configBloc.clear();
+    // contactBloc.clear();
 
     final isLoggedIn = authBloc.state.user != null;
 

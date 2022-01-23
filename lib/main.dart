@@ -47,7 +47,10 @@ void main() async {
             ),
             BlocProvider<BillBloc>(
               create: (_) => BillBloc(),
-            )
+            ),
+            BlocProvider<ContactBloc>(
+              create: (_) => ContactBloc(),
+            ),
           ],
           child: const BlitterApp(),
         ),
