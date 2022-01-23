@@ -85,7 +85,7 @@ class APIRepository extends IAPIRepository {
   Future<http.Response> fetchUserProfiles(JsonMap payload) async {
     var response = await http.post(
       ApiURI.fetchUserProfiles(),
-      body: json.encode(payload),
+      body: jsonEncode(payload),
       headers: {..._getAuthHeaders(), 'Content-type': 'application/json'},
     );
     return response;
