@@ -71,6 +71,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
             Avatar(
               getImage: _getImage,
               pickImage: _pickImage,
+              name: userState?.name
             ),
             const SizedBox(height: 45),
             TranslucentTextFormFieldContainer(
@@ -138,7 +139,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
                   payload['avatar'] = selectedAvatar.path;
                 }
                 final cubit = context.read<SigninCubit>();
-                await cubit.updateProfile(payload);
+                await cubit.initializeApp(payload);
                 Navigator.of(context).popAndPushNamed(DashboardScreen.route);
               },
             ),
