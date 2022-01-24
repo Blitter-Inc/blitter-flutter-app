@@ -39,9 +39,9 @@ class DescriptionInput extends StatelessWidget {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25),
-          borderSide: const BorderSide(
+          borderSide: BorderSide(
             width: 2,
-            color: Colors.orange,
+            color: colorScheme.primary,
             style: BorderStyle.solid,
           ),
         ),
