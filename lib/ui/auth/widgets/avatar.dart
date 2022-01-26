@@ -21,37 +21,39 @@ class Avatar extends StatelessWidget {
             radius: 90,
             foregroundColor: Colors.black.withOpacity(0.9),
             backgroundColor: Colors.white.withOpacity(0.2),
-            child: ClipOval(
-                child: avatar != null
-                    ? Image(
-                        image: avatar,
-                        width: 180,
-                        height: 180,
-                        fit: BoxFit.fill,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        },
-                        errorBuilder: (context, error, stackTrace) =>
-                            name != null
-                                ? CircleAvatar(
-                                    backgroundColor:
-                                        Colors.black54.withOpacity(0.7),
-                                    child: Text(name![0],
-                                        style: const TextStyle(
-                                          fontSize: 80,
-                                        )),
-                                    radius: 90,
-                                  )
-                                : const Icon(
-                                    Icons.person,
-                                    size: 135,
-                                  ),
-                      )
-                    : const Icon(
-                        Icons.person,
-                        size: 135,
-                      )),
+            child: avatar != null
+                ? ClipOval(
+                    child: Image(
+                      image: avatar,
+                      width: 180,
+                      height: 180,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (BuildContext context, Widget child,
+                          ImageChunkEvent? loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => name != null
+                          ? CircleAvatar(
+                              backgroundColor: Colors.black54.withOpacity(0.7),
+                              child: Text(name![0],
+                                  style: const TextStyle(
+                                    fontSize: 80,
+                                  )),
+                              radius: 90,
+                            )
+                          : const Icon(
+                              Icons.person,
+                              size: 135,
+                            ),
+                    ),
+                  )
+                : const Icon(
+                    Icons.person,
+                    size: 135,
+                  ),
           ),
           const Positioned(
             child: CircleAvatar(
