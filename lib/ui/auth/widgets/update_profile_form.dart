@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
@@ -35,13 +35,14 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
   }
 
   Future _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
     try {
-      final image = await _picker.pickImage(source: ImageSource.gallery);
+      final image = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+      );
       if (image == null) return;
       setState(() {
         avatarSelectorMode = true;
-        selectedAvatar = File(image.path);
+        selectedAvatar = File(image.files.single.path!);
       });
     } on Exception catch (e) {
       print('Failed to pick image: $e');
@@ -69,10 +70,9 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
           children: [
             const SizedBox(height: 25),
             Avatar(
-              getImage: _getImage,
-              pickImage: _pickImage,
-              name: userState?.name
-            ),
+                getImage: _getImage,
+                pickImage: _pickImage,
+                name: userState?.name),
             const SizedBox(height: 45),
             TranslucentTextFormFieldContainer(
               paddingHorizontal: 5,
