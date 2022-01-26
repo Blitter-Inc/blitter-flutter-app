@@ -28,4 +28,6 @@ class ContactBloc extends HydratedBloc<ContactEvent, ContactState> {
             ) ??
             {},
       };
+
+  User? getUserById(int id) => state.objectMap![id.toString()];
 }
