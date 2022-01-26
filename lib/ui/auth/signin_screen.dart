@@ -8,6 +8,7 @@ import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/exceptions.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
+import 'package:blitter_flutter_app/ui.dart';
 import 'package:blitter_flutter_app/ui/shared.dart';
 import './widgets/widgets.dart';
 
@@ -28,6 +29,7 @@ class _SigninScreenState extends State<SigninScreen>
   bool _isLoading = false;
   bool _otpSent = false;
   bool _otpVerified = false;
+  bool _profileUpdatedDataSet = false;
 
   late AnimationController _formOpacityController;
   late Animation<double> _formOpacity;
@@ -94,6 +96,20 @@ class _SigninScreenState extends State<SigninScreen>
     };
   }
 
+  Future<void> _startInitializeHandler() async {
+    _formOpacityController.reverse();
+    await Future.delayed(const Duration(milliseconds: 1000));
+    setState(() {
+      _otpVerified = false;
+      _profileUpdatedDataSet = true;
+    });
+    _formOpacityController.forward();
+  }
+
+  void _initializationCompleteHandler() {
+    Navigator.of(context).popAndPushNamed(DashboardScreen.route);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -130,16 +146,56 @@ class _SigninScreenState extends State<SigninScreen>
 
   @override
   Widget build(BuildContext context) {
+    Widget child;
+
+    if (_profileUpdatedDataSet) {
+      child = _formFadeTransitionContainer(const Initialize());
+    } else if (_otpVerified) {
+      child = _formFadeTransitionContainer(UpdateProfileForm(
+        initializeHandler: _startInitializeHandler,
+      ));
+    } else {
+      child = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          FadeTransition(
+            opacity: _logoOpacity,
+            child: const BlitterText(),
+          ),
+          const SizedBox(height: 40),
+          SizedBox(
+            height: 205,
+            child: _isLoading
+                ? _formFadeTransitionContainer(const LoadingSpinner())
+                : !_otpSent
+                    ? _formFadeTransitionContainer(
+                        PhoneInputForm(
+                          animateOutForm: _animateOutForm,
+                        ),
+                      )
+                    : _formFadeTransitionContainer(
+                        OTPInputForm(
+                          animateOutForm: _animateOutForm,
+                        ),
+                      ),
+          ),
+        ],
+      );
+    }
+
     return BlocProvider(
       lazy: false,
       create: (_) => SigninCubit(
         authBloc: context.read<AuthBloc>(),
+        billBloc: context.read<BillBloc>(),
         contactBloc: context.read<ContactBloc>(),
         apiRepository: context.read<APIRepository>(),
         apiSerializerRepository: context.read<APISerializerRepository>(),
         codeSentHandler: _codeSentHandler,
         verificationCompletedHandler: _verificationCompletedHandler,
         verificationFailedHandler: _buildVerificationFailedHandler(context),
+        initializationCompleteHandler: _initializationCompleteHandler,
       ),
       child: Scaffold(
         extendBodyBehindAppBar: true,
@@ -171,36 +227,7 @@ class _SigninScreenState extends State<SigninScreen>
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 25),
               alignment: Alignment.center,
-              child: _otpVerified
-                  ? _formFadeTransitionContainer(const UpdateProfileForm())
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        FadeTransition(
-                          opacity: _logoOpacity,
-                          child: const BlitterText(),
-                        ),
-                        const SizedBox(height: 40),
-                        SizedBox(
-                          height: 205,
-                          child: _isLoading
-                              ? _formFadeTransitionContainer(
-                                  const LoadingSpinner())
-                              : !_otpSent
-                                  ? _formFadeTransitionContainer(
-                                      PhoneInputForm(
-                                        animateOutForm: _animateOutForm,
-                                      ),
-                                    )
-                                  : _formFadeTransitionContainer(
-                                      OTPInputForm(
-                                        animateOutForm: _animateOutForm,
-                                      ),
-                                    ),
-                        ),
-                      ],
-                    ),
+              child: child,
             ),
           ],
         ),

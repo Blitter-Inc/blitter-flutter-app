@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:file_picker/file_picker.dart';
@@ -7,12 +8,16 @@ import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
 import 'package:blitter_flutter_app/data/types.dart';
-import 'package:blitter_flutter_app/ui.dart';
 import 'package:blitter_flutter_app/ui/shared.dart';
 import './avatar.dart';
 
 class UpdateProfileForm extends StatefulWidget {
-  const UpdateProfileForm({Key? key}) : super(key: key);
+  final AsyncCallback initializeHandler;
+
+  const UpdateProfileForm({
+    Key? key,
+    required this.initializeHandler,
+  }) : super(key: key);
 
   @override
   _UpdateProfileFormState createState() => _UpdateProfileFormState();
@@ -66,7 +71,6 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
       child: Container(
         padding: const EdgeInsets.only(top: 85),
         child: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 25),
             Avatar(
@@ -139,8 +143,8 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
                   payload['avatar'] = selectedAvatar.path;
                 }
                 final cubit = context.read<SigninCubit>();
-                await cubit.initializeApp(payload);
-                Navigator.of(context).popAndPushNamed(DashboardScreen.route);
+                cubit.setProfileDataJson(payload);
+                await widget.initializeHandler();
               },
             ),
           ],

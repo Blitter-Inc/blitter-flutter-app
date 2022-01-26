@@ -14,22 +14,26 @@ import '../repositories/repositories.dart';
 
 class SigninCubit extends Cubit<SigninState> {
   final AuthBloc authBloc;
+  final BillBloc billBloc;
   final ContactBloc contactBloc;
   final APIRepository apiRepository;
   final APISerializerRepository apiSerializerRepository;
   final AsyncCallback codeSentHandler;
   final AsyncCallback verificationCompletedHandler;
   final AsyncValueSetter<AuthException> verificationFailedHandler;
+  final VoidCallback initializationCompleteHandler;
   FirebaseAuth? auth;
 
   SigninCubit({
     required this.authBloc,
+    required this.billBloc,
     required this.contactBloc,
     required this.apiRepository,
     required this.apiSerializerRepository,
     required this.codeSentHandler,
     required this.verificationCompletedHandler,
     required this.verificationFailedHandler,
+    required this.initializationCompleteHandler,
   }) : super(SigninState()) {
     if (Platform.isAndroid) {
       auth = FirebaseAuth.instance;
@@ -85,6 +89,71 @@ class SigninCubit extends Cubit<SigninState> {
     await verificationCompletedHandler();
   }
 
+  Future _fetchContactsHandler() async {
+    if (await Permission.contacts.request().isGranted) {
+      List<Contact> contacts =
+          await ContactsService.getContacts(withThumbnails: false);
+      final phoneNumber = <String>{};
+
+      for (var contact in contacts) {
+        contact.phones?.forEach((numberObj) {
+          var number = numberObj.value?.replaceAll(RegExp('/-|\\s|(|)/g'), "");
+          if (number != null) {
+            if (number.startsWith("0751") ||
+                number.startsWith('+') && !number.startsWith('+91')) {
+              return;
+            } else if (number.startsWith('0') && number.length == 11) {
+              number = "+91" + number.substring(1);
+            } else if (number.length == 10) {
+              number = "+91" + number;
+            }
+
+            if (number.length == 13) {
+              phoneNumber.add(number);
+            }
+          }
+        });
+      }
+      final phoneNumberList = phoneNumber.toList();
+      return phoneNumberList;
+    } else {
+      return [];
+    }
+  }
+
+  Future<void> _syncContacts() async {
+    final List<String> phoneNumberList;
+    if (Platform.isAndroid || Platform.isIOS) {
+      phoneNumberList = await _fetchContactsHandler();
+    } else {
+      phoneNumberList = ['+919643966069', '+918223909888'];
+    }
+
+    final apiRes = await apiRepository.fetchUserProfiles(apiSerializerRepository
+        .fetchUserProfilesRequestSerializer(phoneNumberList));
+    contactBloc.add(InitializeContactState(apiSerializerRepository
+        .fetchUserProfilesResponseSerializer(jsonDecode(apiRes.body))));
+  }
+
+  Future<void> _syncBills() async {
+    final response = await apiRepository.fetchBills();
+    final event = InitializeBillState(
+      apiSerializerRepository.fetchBillsResponseSerializer(
+        jsonDecode(response.body),
+      ),
+    );
+    billBloc.add(event);
+  }
+
+  Future<void> _updateProfile() async {
+    final profileData = jsonDecode(state.profileDataJson);
+    final apiRes = await apiRepository.updateProfile(profileData);
+    final apiResBody = apiSerializerRepository.updateProfileResponseSerializer(
+        jsonDecode(await apiRes.stream.bytesToString()));
+
+    authBloc.add(UserProfileUpdated.fromJson(apiResBody));
+  }
+
   void setPhoneNumber(String phoneNumber) {
     emit(state.copyWith(phoneNumber: phoneNumber));
   }
@@ -95,6 +164,10 @@ class SigninCubit extends Cubit<SigninState> {
 
   void setCode(String code) {
     emit(state.copyWith(code: code));
+  }
+
+  void setProfileDataJson(JsonMap json) {
+    emit(state.copyWith(profileDataJson: jsonEncode(json)));
   }
 
   Future<void> signin() async {
@@ -146,62 +219,12 @@ class SigninCubit extends Cubit<SigninState> {
     }
   }
 
-  Future _fetchContactsHandler() async {
-    if (await Permission.contacts.request().isGranted) {
-      List<Contact> contacts =
-          await ContactsService.getContacts(withThumbnails: false);
-      final phoneNumber = <String>{};
-
-      for (var contact in contacts) {
-        contact.phones?.forEach((numberObj) {
-          var number = numberObj.value?.replaceAll(RegExp('/-|\\s|(|)/g'), "");
-          if (number != null) {
-            if (number.startsWith("0751") ||
-                number.startsWith('+') && !number.startsWith('+91')) {
-              return;
-            } else if (number.startsWith('0') && number.length == 11) {
-              number = "+91" + number.substring(1);
-            } else if (number.length == 10) {
-              number = "+91" + number;
-            }
-
-            if (number.length == 13) {
-              phoneNumber.add(number);
-            }
-          }
-        });
-      }
-      final phoneNumberList = phoneNumber.toList();
-      return phoneNumberList;
-    } else {
-      return [];
-    }
-  }
-
-  Future<void> _syncContactsHandler() async {
-    final List<String> phoneNumberList;
-    if (Platform.isAndroid || Platform.isIOS) {
-      phoneNumberList = await _fetchContactsHandler();
-    } else {
-      phoneNumberList = ['+919643966069', '+918223909888'];
-    }
-
-    final apiRes = await apiRepository.fetchUserProfiles(apiSerializerRepository
-        .fetchUserProfilesRequestSerializer(phoneNumberList));
-    contactBloc.add(InitializeContactState(apiSerializerRepository
-        .fetchUserProfilesResponseSerializer(jsonDecode(apiRes.body))));
-  }
-
-  Future<void> _updateProfileHandler(JsonMap profileData) async {
-    final apiRes = await apiRepository.updateProfile(profileData);
-    final apiResBody = apiSerializerRepository.updateProfileResponseSerializer(
-        jsonDecode(await apiRes.stream.bytesToString()));
-
-    authBloc.add(UserProfileUpdated.fromJson(apiResBody));
-  }
-
-  Future<void> initializeApp(JsonMap profileData) async {
-    await _updateProfileHandler(profileData);
-    await _syncContactsHandler();
+  Future<void> initializeApp() async {
+    await Future.wait([
+      _updateProfile(),
+      _syncContacts(),
+      _syncBills(),
+    ]);
+    initializationCompleteHandler();
   }
 }
