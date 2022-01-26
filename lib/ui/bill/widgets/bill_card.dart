@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/models.dart' show Bill;
 import 'package:blitter_flutter_app/utils/extensions.dart';
 
@@ -16,6 +18,7 @@ class BillCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final contactBloc = context.read<ContactBloc>();
     final colorScheme = Theme.of(context).colorScheme;
     final subtextStyle = TextStyle(
       color: colorScheme.cardSubtext,
@@ -96,7 +99,7 @@ class BillCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'By: ${bill.createdBy}',
+                      'By: ${contactBloc.getUserById(bill.createdBy)?.name}',
                       style: subtextStyle,
                     ),
                     const Spacer(),
