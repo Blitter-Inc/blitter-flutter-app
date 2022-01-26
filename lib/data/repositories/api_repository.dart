@@ -40,7 +40,9 @@ class ApiURI {
 }
 
 class APIRepository extends IAPIRepository {
-  late AuthState _authState;
+  AuthState _authState;
+
+  APIRepository({required AuthState authState}) : _authState = authState;
 
   set authState(AuthState state) {
     _authState = state;
