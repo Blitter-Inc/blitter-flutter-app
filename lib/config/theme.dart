@@ -28,6 +28,7 @@ ThemeData generateThemeDataFromPalette({
       elevation: 0,
       foregroundColor: palette.appBarForegroundColor,
       backgroundColor: palette.appBarBackgroundColor,
+      shadowColor: palette.appBarShadowColor,
     ),
   );
 }

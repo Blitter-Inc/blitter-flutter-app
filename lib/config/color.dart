@@ -20,6 +20,7 @@ abstract class ThemeColorPalette {
   Color get bottomSheetModalBackgroundColor;
   Color get appBarForegroundColor;
   Color get appBarBackgroundColor;
+  Color get appBarShadowColor;
   Color get snackBarContentTextColor;
   Color get snackBarBackgroundColor;
   Color get scaffoldBackgroundColor;
@@ -44,7 +45,11 @@ class LightThemeColorPalette implements ThemeColorPalette {
   Color get appBarForegroundColor => Colors.black;
 
   @override
-  Color get appBarBackgroundColor => Colors.transparent;
+  Color get appBarBackgroundColor => Colors.grey[50]!;
+  
+  @override
+  Color get appBarShadowColor => Colors.black;
+  
 
   @override
   Color get snackBarContentTextColor => Colors.black;
@@ -77,7 +82,11 @@ class DarkThemeColorPalette implements ThemeColorPalette {
   Color get appBarForegroundColor => Colors.white;
 
   @override
-  Color get appBarBackgroundColor => Colors.transparent;
+  Color get appBarBackgroundColor => Colors.black;
+  
+  @override
+  Color get appBarShadowColor => Colors.white24;
+  
 
   @override
   Color get snackBarContentTextColor => Colors.black;
