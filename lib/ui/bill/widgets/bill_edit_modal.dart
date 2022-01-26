@@ -84,7 +84,7 @@ class _BillEditModalState extends State<BillEditModal>
           margin: const EdgeInsets.only(bottom: 100),
           child: SingleChildScrollView(
             padding: EdgeInsets.only(
-              top: widget.bill == null ? 15 : 0,
+              top: widget.bill == null ? 23 : 8,
               left: 10,
               right: 10,
               bottom: 20,
