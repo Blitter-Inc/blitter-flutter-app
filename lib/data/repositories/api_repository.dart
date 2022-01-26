@@ -52,6 +52,13 @@ class APIRepository extends IAPIRepository {
     };
   }
 
+  Map<String, String> _getHeaders() {
+    return {
+      ..._getAuthHeaders(),
+      'Content-type': 'application/json',
+    };
+  }
+
   @override
   Future<http.Response> signIn(JsonMap payload) async {
     var response = await http.post(
@@ -86,7 +93,7 @@ class APIRepository extends IAPIRepository {
     var response = await http.post(
       ApiURI.fetchUserProfiles(),
       body: jsonEncode(payload),
-      headers: {..._getAuthHeaders(), 'Content-type': 'application/json'},
+      headers: _getHeaders(),
     );
     return response;
   }
@@ -104,8 +111,8 @@ class APIRepository extends IAPIRepository {
   Future<http.Response> createBill(JsonMap payload) async {
     var response = await http.post(
       ApiURI.createBill(),
-      headers: _getAuthHeaders(),
-      body: payload,
+      headers: _getHeaders(),
+      body: jsonEncode(payload),
     );
     return response;
   }
@@ -114,8 +121,8 @@ class APIRepository extends IAPIRepository {
   Future<http.Response> updateBill(int id, JsonMap payload) async {
     var response = await http.patch(
       ApiURI.updateBill(id),
-      headers: _getAuthHeaders(),
-      body: payload,
+      headers: _getHeaders(),
+      body: jsonEncode(payload),
     );
     return response;
   }

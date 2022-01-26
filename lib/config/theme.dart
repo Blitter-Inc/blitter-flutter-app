@@ -17,6 +17,7 @@ ThemeData generateThemeDataFromPalette({
     ),
     colorScheme: colorScheme.copyWith(
       primary: primary,
+      secondary: primary,
     ),
     scaffoldBackgroundColor: palette.scaffoldBackgroundColor,
     cardColor: palette.cardColor,
@@ -38,6 +39,7 @@ ThemeData generateModuleThemeData({
   return defaultThemeData.copyWith(
     colorScheme: defaultThemeData.colorScheme.copyWith(
       primary: modulePrimaryColor,
+      secondary: modulePrimaryColor,
     ),
     appBarTheme: defaultThemeData.appBarTheme.copyWith(
       foregroundColor: modulePrimaryColor,
