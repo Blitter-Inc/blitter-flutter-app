@@ -78,83 +78,95 @@ class _BillEditModalState extends State<BillEditModal>
     final mediaQuery = MediaQuery.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Stack(
-      children: [
-        Container(
-          margin: const EdgeInsets.only(bottom: 100),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(
-              top: widget.bill == null ? 15 : 0,
-              left: 10,
-              right: 10,
-              bottom: 20,
-            ),
-            child: Column(
-              children: [
-                BillNameInput(
-                  controller: _input.nameController,
-                  enabled: true,
-                ),
-                const SizedBox(height: 20),
-                AmountInput(
-                  controller: _input.amountController,
-                  enabled: true,
-                ),
-                const SizedBox(height: 10),
-                const Divider(),
-                BillTypePicker(
-                  initialValue: _input.type,
-                  onChanged: _setBillType,
-                ),
-                const SizedBox(height: 20),
-                DescriptionInput(
-                  controller: _input.descriptionController,
-                  enabled: true,
-                ),
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          child: Container(
-            height: 100,
-            color: colorScheme.bottomSheetModalBackground,
-            width: mediaQuery.size.width,
-            child: Column(
-              children: [
-                const BillAction(),
-                BottomModalSubmitButton(
-                    onSubmit: () => _onSubmit(context.read<BillModalCubit>())),
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-          top: 0,
-          left: 0,
-          child: TextButton(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
-                  Icon(Icons.arrow_back_ios, size: 12.5),
-                  Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold)),
+    return WillPopScope(
+      onWillPop: () async {
+        if (widget.bill == null) {
+          return true;
+        } else {
+          widget.toggleEdit();
+          return false;
+        }
+      },
+      child: Stack(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(bottom: 100),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                top: widget.bill == null ? 23 : 8,
+                left: 10,
+                right: 10,
+                bottom: 20,
+              ),
+              child: Column(
+                children: [
+                  BillNameInput(
+                    controller: _input.nameController,
+                    enabled: true,
+                  ),
+                  const SizedBox(height: 20),
+                  AmountInput(
+                    controller: _input.amountController,
+                    enabled: true,
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(),
+                  BillTypePicker(
+                    initialValue: _input.type,
+                    onChanged: _setBillType,
+                  ),
+                  const SizedBox(height: 20),
+                  DescriptionInput(
+                    controller: _input.descriptionController,
+                    enabled: true,
+                  ),
                 ],
               ),
             ),
-            onPressed: () {
-              if (widget.bill == null) {
-                Navigator.of(context).pop();
-              } else {
-                widget.toggleEdit();
-              }
-            },
           ),
-        ),
-        if (_isLoading) const LinearProgressIndicator(),
-      ],
+          Positioned(
+            bottom: 0,
+            child: Container(
+              height: 100,
+              color: colorScheme.bottomSheetModalBackground,
+              width: mediaQuery.size.width,
+              child: Column(
+                children: [
+                  const BillAction(),
+                  BottomModalSubmitButton(
+                      onSubmit: () =>
+                          _onSubmit(context.read<BillModalCubit>())),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            child: TextButton(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: const [
+                    Icon(Icons.arrow_back_ios, size: 12.5),
+                    Text('Cancel',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+              onPressed: () {
+                if (widget.bill == null) {
+                  Navigator.of(context).pop();
+                } else {
+                  widget.toggleEdit();
+                }
+              },
+            ),
+          ),
+          if (_isLoading) const LinearProgressIndicator(),
+        ],
+      ),
     );
   }
 }

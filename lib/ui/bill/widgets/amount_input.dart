@@ -12,8 +12,9 @@ class AmountInput extends StatelessWidget {
   final bool enabled;
 
   void _incrementAmount(double value) {
-    controller.text =
-        (double.parse(controller.text) + value).toStringAsFixed(2);
+    final currentAmount =
+        controller.text.isNotEmpty ? double.parse(controller.text) : 0.0;
+    controller.text = (currentAmount + value).toStringAsFixed(2);
   }
 
   @override

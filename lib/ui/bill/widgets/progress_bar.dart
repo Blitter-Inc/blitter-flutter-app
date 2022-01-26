@@ -39,7 +39,10 @@ class _ProgressBarState extends State<ProgressBar> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
     final colorScheme = Theme.of(context).colorScheme;
+
+    final progressBarWidth = mediaQuery.size.width - 30;
 
     return Stack(
       alignment: _progressBarWidthFactor > 0.12
@@ -48,16 +51,10 @@ class _ProgressBarState extends State<ProgressBar> {
       children: [
         Container(
           height: 20,
-          width: 320,
+          width: progressBarWidth,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25),
             color: Colors.grey[850],
-            boxShadow: const [
-              BoxShadow(
-                offset: Offset(1, 3),
-                blurRadius: 5,
-              ),
-            ],
           ),
         ),
         ClipRRect(
@@ -70,7 +67,7 @@ class _ProgressBarState extends State<ProgressBar> {
               children: [
                 Container(
                   height: 20,
-                  width: 320 * _progressBarWidthFactor,
+                  width: progressBarWidth * _progressBarWidthFactor,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -78,12 +75,6 @@ class _ProgressBarState extends State<ProgressBar> {
                         colorScheme.primary,
                       ],
                     ),
-                    boxShadow: const [
-                      BoxShadow(
-                        offset: Offset(3, 3),
-                        blurRadius: 5,
-                      ),
-                    ],
                   ),
                 ),
                 if (_progressBarWidthFactor > 0.12)

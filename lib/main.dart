@@ -26,33 +26,39 @@ void main() async {
   }
   HydratedBlocOverrides.runZoned(
     () => runApp(
-      MultiRepositoryProvider(
-        providers: [
-          RepositoryProvider<APIRepository>(
-            create: (context) => APIRepository(),
-          ),
-          RepositoryProvider<APISerializerRepository>(
-            create: (_) => APISerializerRepository(),
-          ),
-        ],
-        child: MultiBlocProvider(
+      BlocProvider<AuthBloc>(
+        create: (_) => AuthBloc(),
+        lazy: false,
+        child: MultiRepositoryProvider(
           providers: [
-            BlocProvider<ConfigBloc>(
-              create: (_) => ConfigBloc(),
-              lazy: false,
+            RepositoryProvider<APIRepository>(
+              create: (context) => APIRepository(
+                authState: context.read<AuthBloc>().state,
+              ),
             ),
-            BlocProvider<AuthBloc>(
-              create: (_) => AuthBloc(),
-              lazy: false,
-            ),
-            BlocProvider<BillBloc>(
-              create: (_) => BillBloc(),
-            ),
-            BlocProvider<ContactBloc>(
-              create: (_) => ContactBloc(),
+            RepositoryProvider<APISerializerRepository>(
+              create: (_) => APISerializerRepository(),
             ),
           ],
-          child: const BlitterApp(),
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider<ConfigBloc>(
+                create: (_) => ConfigBloc(),
+                lazy: false,
+              ),
+              BlocProvider<AuthBloc>(
+                create: (_) => AuthBloc(),
+                lazy: false,
+              ),
+              BlocProvider<BillBloc>(
+                create: (_) => BillBloc(),
+              ),
+              BlocProvider<ContactBloc>(
+                create: (_) => ContactBloc(),
+              ),
+            ],
+            child: const BlitterApp(),
+          ),
         ),
       ),
     ),
