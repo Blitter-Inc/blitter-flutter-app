@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:blitter_flutter_app/data/cubits.dart';
 
 class AmountInput extends StatelessWidget {
-  const AmountInput({Key? key}) : super(key: key);
+  const AmountInput({
+    Key? key,
+    required this.controller,
+    required this.enabled,
+  }) : super(key: key);
+
+  final TextEditingController controller;
+  final bool enabled;
+
+  void _incrementAmount(double value) {
+    controller.text =
+        (double.parse(controller.text) + value).toStringAsFixed(2);
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final cubit = context.read<BillManagerCubit>();
-    final state = cubit.state.billModalState!;
 
     return Column(
       children: [
         TextFormField(
-          initialValue: state.amount,
+          controller: controller,
+          enabled: enabled,
           style: TextStyle(
             color: colorScheme.primary,
             fontSize: 18,
@@ -24,9 +32,10 @@ class AmountInput extends StatelessWidget {
           ),
           keyboardType: TextInputType.number,
           inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
+            FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}')),
           ],
           decoration: InputDecoration(
+            suffixText: enabled ? '' : '/~',
             labelText: 'Amount',
             prefixText: '₹  ',
             prefixStyle: TextStyle(
@@ -42,30 +51,40 @@ class AmountInput extends StatelessWidget {
                 style: BorderStyle.solid,
               ),
             ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: BorderSide(
+                width: 2,
+                color: colorScheme.primary,
+                style: BorderStyle.solid,
+              ),
+            ),
           ),
         ),
-        const SizedBox(height: 18),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Row(
-            children: [
-              OutlinedButton(
-                onPressed: () {},
-                child: const Text('+100'),
-              ),
-              const Spacer(),
-              OutlinedButton(
-                onPressed: () {},
-                child: const Text('+500'),
-              ),
-              const Spacer(),
-              OutlinedButton(
-                onPressed: () {},
-                child: const Text('+1000'),
-              ),
-            ],
+        if (enabled) ...[
+          const SizedBox(height: 18),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Row(
+              children: [
+                OutlinedButton(
+                  onPressed: () => _incrementAmount(100),
+                  child: const Text('+100'),
+                ),
+                const Spacer(),
+                OutlinedButton(
+                  onPressed: () => _incrementAmount(500),
+                  child: const Text('+500'),
+                ),
+                const Spacer(),
+                OutlinedButton(
+                  onPressed: () => _incrementAmount(1000),
+                  child: const Text('+1000'),
+                ),
+              ],
+            ),
           ),
-        ),
+        ]
       ],
     );
   }

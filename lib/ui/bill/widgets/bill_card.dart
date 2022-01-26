@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/models.dart' show Bill;
-import 'package:blitter_flutter_app/extensions.dart';
+import 'package:blitter_flutter_app/data/repositories.dart';
+import 'package:blitter_flutter_app/utils/extensions.dart';
 import './bill_modal.dart';
 
 class BillCard extends StatelessWidget {
@@ -22,7 +24,6 @@ class BillCard extends StatelessWidget {
       color: colorScheme.cardSubtext,
       fontSize: 11.5,
     );
-
     final isFulfilled = bill.status == "fulfilled";
 
     return Container(
@@ -37,13 +38,14 @@ class BillCard extends StatelessWidget {
         child: InkWell(
           borderRadius: context.billCardBorderRadius,
           onTap: () {
-            final cubit = context.read<BillManagerCubit>();
-            cubit.setBillModalInput(bill);
             showModalBottomSheet(
               context: context,
-              builder: (context) => BlocProvider.value(
-                value: cubit,
-                child: const BillModal(),
+              builder: (_) => BlocProvider(
+                create: (_) => BillModalCubit(
+                  billBloc: context.read<BillBloc>(),
+                  apiRepository: context.read<APIRepository>(),
+                ),
+                child: BillModal(bill: bill),
               ),
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(

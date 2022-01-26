@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:blitter_flutter_app/data/cubits.dart';
 
 class DescriptionInput extends StatelessWidget {
-  const DescriptionInput({Key? key}) : super(key: key);
+  const DescriptionInput({
+    Key? key,
+    required this.controller,
+    required this.enabled,
+  }) : super(key: key);
+
+  final TextEditingController controller;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final cubit = context.read<BillManagerCubit>();
-    final state = cubit.state.billModalState!;
 
     return TextFormField(
-      initialValue: state.description,
+      controller: controller,
+      enabled: enabled,
       textCapitalization: TextCapitalization.sentences,
       maxLines: 3,
       style: TextStyle(
@@ -31,6 +34,14 @@ class DescriptionInput extends StatelessWidget {
           borderSide: const BorderSide(
             width: 2,
             color: Colors.white54,
+            style: BorderStyle.solid,
+          ),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(
+            width: 2,
+            color: colorScheme.primary,
             style: BorderStyle.solid,
           ),
         ),

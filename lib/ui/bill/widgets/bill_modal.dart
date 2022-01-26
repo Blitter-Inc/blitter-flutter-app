@@ -1,76 +1,89 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:blitter_flutter_app/data/cubits.dart';
-import 'package:blitter_flutter_app/extensions.dart';
-import './amount_input.dart';
-import './description_input.dart';
-import './bottom_modal_submit_button.dart';
-import './bill_action.dart';
-import './bill_name_input.dart';
-import './bill_type_picker.dart';
+import 'package:blitter_flutter_app/config.dart';
+import 'package:blitter_flutter_app/data/models.dart';
+import './bill_edit_modal.dart';
+import './bill_view_modal.dart';
 
-class BillModal extends StatelessWidget {
+class BillModal extends StatefulWidget {
   const BillModal({
     Key? key,
+    required this.bill,
   }) : super(key: key);
+
+  final Bill? bill;
+
+  @override
+  State<BillModal> createState() => _BillModalState();
+}
+
+class _BillModalState extends State<BillModal>
+    with SingleTickerProviderStateMixin {
+  bool _editable = false;
+
+  late AnimationController _modalOpacityController;
+  late Animation<double> _modalOpacity;
+
+  Future<void> _toggleEdit() async {
+    await _modalOpacityController.reverse();
+    setState(() {
+      _editable = !_editable;
+    });
+    _modalOpacityController.forward();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _modalOpacityController = AnimationController(
+      vsync: this,
+      duration: defaultTransitionDuration,
+    );
+    _modalOpacity = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _modalOpacityController,
+        curve: Curves.easeInOutQuint,
+      ),
+    );
+    _modalOpacityController.forward();
+  }
+
+  @override
+  void dispose() {
+    _modalOpacityController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final cubit = context.read<BillManagerCubit>();
-    final state = cubit.state.billModalState!;
 
-    return Container(
-      padding: EdgeInsets.only(
-        bottom: mediaQuery.viewInsets.bottom,
-      ),
-      constraints: BoxConstraints(
-        maxHeight: mediaQuery.size.height - 125,
-      ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(15),
-        ),
-        child: Stack(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(bottom: 100),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(
-                  left: 10,
-                  right: 10,
-                  bottom: 20,
-                ),
-                child: Column(
-                  children: const [
-                    BillNameInput(),
-                    SizedBox(height: 20),
-                    AmountInput(),
-                    SizedBox(height: 10),
-                    Divider(),
-                    BillTypePicker(),
-                    SizedBox(height: 20),
-                    DescriptionInput(),
-                  ],
-                ),
-              ),
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutQuint,
+      child: FadeTransition(
+        opacity: _modalOpacity,
+        child: Container(
+          padding: EdgeInsets.only(
+            bottom: mediaQuery.viewInsets.bottom,
+          ),
+          constraints: BoxConstraints(
+            maxHeight: mediaQuery.size.height - 125,
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(15),
             ),
-            Positioned(
-              bottom: 0,
-              child: Container(
-                height: 100,
-                color: Theme.of(context).colorScheme.bottomSheetModalBackground,
-                width: mediaQuery.size.width,
-                child: Column(
-                  children: const [
-                    BillAction(),
-                    BottomModalSubmitButton(),
-                  ],
-                ),
-              ),
-            )
-          ],
+            child: !_editable
+                ? BillViewModal(
+                    bill: widget.bill!,
+                    toggleEdit: _toggleEdit,
+                  )
+                : BillEditModal(
+                    bill: widget.bill,
+                    toggleEdit: _toggleEdit,
+                  ),
+          ),
         ),
       ),
     );
