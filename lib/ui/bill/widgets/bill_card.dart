@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import 'package:blitter_flutter_app/data/blocs.dart';
-import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/models.dart' show Bill;
-import 'package:blitter_flutter_app/data/repositories.dart';
 import 'package:blitter_flutter_app/utils/extensions.dart';
-import './bill_modal.dart';
 
 class BillCard extends StatelessWidget {
   final Bill bill;
+  final Function(BuildContext, {String billId}) showModalHandler;
 
   const BillCard({
     Key? key,
     required this.bill,
+    required this.showModalHandler,
   }) : super(key: key);
 
   @override
@@ -37,25 +34,7 @@ class BillCard extends StatelessWidget {
         shadowColor: Colors.grey.shade600,
         child: InkWell(
           borderRadius: context.billCardBorderRadius,
-          onTap: () {
-            showModalBottomSheet(
-              context: context,
-              builder: (_) => BlocProvider(
-                create: (_) => BillModalCubit(
-                  billBloc: context.read<BillBloc>(),
-                  apiRepository: context.read<APIRepository>(),
-                ),
-                child: BillModal(bill: bill),
-              ),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(10),
-                ),
-              ),
-              barrierColor: Colors.black87,
-              isScrollControlled: true,
-            );
-          },
+          onTap: () => showModalHandler(context, billId: bill.id.toString()),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             child: Column(

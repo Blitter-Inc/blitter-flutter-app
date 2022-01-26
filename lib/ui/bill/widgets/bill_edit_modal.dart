@@ -29,6 +29,13 @@ class BillEditModal extends StatefulWidget {
 class _BillEditModalState extends State<BillEditModal>
     with SingleTickerProviderStateMixin {
   late BillModalInput _input;
+  bool _isLoading = false;
+
+  void _toggleLoading() {
+    setState(() {
+      _isLoading = !_isLoading;
+    });
+  }
 
   void _initializeModalInput() {
     if (widget.bill != null) {
@@ -39,18 +46,19 @@ class _BillEditModalState extends State<BillEditModal>
   }
 
   void _setBillType(String type) {
-    print('SET BILLL TYPE TRIGGERED with value: $type');
     _input.type = type;
   }
 
   Future<void> _onSubmit(BillModalCubit cubit) async {
-    print(_input.toAPIPayload());
-    widget.toggleEdit();
-    // if (widget.bill != null) {
-    //   cubit.updateBill(id: widget.bill!.id, input: _input);
-    // } else {
-    //   cubit.createBill(input: _input);
-    // }
+    _toggleLoading();
+    if (widget.bill != null) {
+      await cubit.updateBill(id: widget.bill!.id, input: _input);
+      widget.toggleEdit();
+    } else {
+      await cubit.createBill(input: _input);
+      Navigator.of(context).pop();
+    }
+    _toggleLoading();
   }
 
   @override
@@ -68,13 +76,15 @@ class _BillEditModalState extends State<BillEditModal>
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Stack(
       children: [
         Container(
           margin: const EdgeInsets.only(bottom: 100),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.only(
+            padding: EdgeInsets.only(
+              top: widget.bill == null ? 15 : 0,
               left: 10,
               right: 10,
               bottom: 20,
@@ -109,7 +119,7 @@ class _BillEditModalState extends State<BillEditModal>
           bottom: 0,
           child: Container(
             height: 100,
-            color: Theme.of(context).colorScheme.bottomSheetModalBackground,
+            color: colorScheme.bottomSheetModalBackground,
             width: mediaQuery.size.width,
             child: Column(
               children: [
@@ -120,6 +130,30 @@ class _BillEditModalState extends State<BillEditModal>
             ),
           ),
         ),
+        Positioned(
+          top: 0,
+          left: 0,
+          child: TextButton(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: const [
+                  Icon(Icons.arrow_back_ios, size: 12.5),
+                  Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            onPressed: () {
+              if (widget.bill == null) {
+                Navigator.of(context).pop();
+              } else {
+                widget.toggleEdit();
+              }
+            },
+          ),
+        ),
+        if (_isLoading) const LinearProgressIndicator(),
       ],
     );
   }

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/config.dart';
-import 'package:blitter_flutter_app/data/models.dart';
+import 'package:blitter_flutter_app/data/blocs.dart';
 import './bill_edit_modal.dart';
 import './bill_view_modal.dart';
 
 class BillModal extends StatefulWidget {
   const BillModal({
     Key? key,
-    required this.bill,
+    this.billId,
   }) : super(key: key);
 
-  final Bill? bill;
+  final String? billId;
 
   @override
   State<BillModal> createState() => _BillModalState();
@@ -35,6 +36,11 @@ class _BillModalState extends State<BillModal>
   @override
   void initState() {
     super.initState();
+    if (widget.billId == null) {
+      setState(() {
+        _editable = true;
+      });
+    }
     _modalOpacityController = AnimationController(
       vsync: this,
       duration: defaultTransitionDuration,
@@ -74,15 +80,29 @@ class _BillModalState extends State<BillModal>
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(15),
             ),
-            child: !_editable
-                ? BillViewModal(
-                    bill: widget.bill!,
-                    toggleEdit: _toggleEdit,
-                  )
-                : BillEditModal(
-                    bill: widget.bill,
-                    toggleEdit: _toggleEdit,
-                  ),
+            child: BlocBuilder<BillBloc, BillState>(
+              buildWhen: (previous, current) {
+                if (widget.billId == null) {
+                  return false;
+                }
+                return previous.objectMap![widget.billId!]!.lastUpdatedAt !=
+                    current.objectMap![widget.billId!]!.lastUpdatedAt;
+              },
+              builder: (context, state) {
+                final bill = widget.billId == null
+                    ? null
+                    : state.objectMap![widget.billId];
+                return !_editable
+                    ? BillViewModal(
+                        bill: bill!,
+                        toggleEdit: _toggleEdit,
+                      )
+                    : BillEditModal(
+                        bill: bill,
+                        toggleEdit: _toggleEdit,
+                      );
+              },
+            ),
           ),
         ),
       ),

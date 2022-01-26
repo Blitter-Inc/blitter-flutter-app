@@ -9,6 +9,28 @@ class BillBloc extends HydratedBloc<BillEvent, BillState> {
     on<InitializeBillState>((event, emit) {
       emit(event.stateObj);
     });
+
+    on<AddBill>((event, emit) {
+      emit(state.copyWith(
+        totalCount: state.totalCount + 1,
+        inStateCount: state.inStateCount + 1,
+        lastModified: DateTime.now().toString(),
+        orderedSequence: state.orderedSequence!..insert(0, event.bill.id),
+        objectMap: state.objectMap!..[event.bill.id.toString()] = event.bill,
+      ));
+    });
+
+    on<UpdateBill>((event, emit) {
+      emit(state.copyWith(
+        lastModified: DateTime.now().toString(),
+        orderedSequence: state.orderedSequence!
+          ..removeWhere((element) => element == event.bill.id)
+          ..insert(0, event.bill.id),
+        objectMap: state.objectMap!
+          ..update(event.bill.id.toString(), (_) => event.bill),
+      ));
+    });
+
     on<ResetBillBloc>((_, emit) => emit(BillState()));
   }
 
@@ -24,6 +46,7 @@ class BillBloc extends HydratedBloc<BillEvent, BillState> {
         ordering: json['ordering'],
         currentPage: json['currentPage'],
         lastRefreshed: json['lastRefreshed'],
+        lastModified: json['lastModified'],
       );
 
   @override
@@ -31,6 +54,7 @@ class BillBloc extends HydratedBloc<BillEvent, BillState> {
         'totalCount': state.totalCount,
         'inStateCount': state.inStateCount,
         'lastRefreshed': state.lastRefreshed,
+        'lastModified': state.lastModified,
         'currentPage': state.currentPage,
         'hasNext': state.hasNext,
         'ordering': state.ordering,
