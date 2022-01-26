@@ -65,37 +65,24 @@ class BillManagerScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 20,
-            // height: 60,
-            // child: Center(
-            //   child: Text('ActionBar goes here'),
-            // ),
-          ),
-          Expanded(
-            child: BlocBuilder<BillBloc, BillState>(
-              buildWhen: (previous, current) {
-                return previous.lastModified != current.lastModified;
-              },
-              builder: (context, state) {
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    final bill = state
-                        .objectMap![state.orderedSequence![index].toString()]!;
-                    return BillCard(
-                      key: ValueKey(bill.id),
-                      bill: bill,
-                      showModalHandler: _showBillModal,
-                    );
-                  },
-                  itemCount: state.inStateCount,
-                );
-              },
-            ),
-          ),
-        ],
+      body: BlocBuilder<BillBloc, BillState>(
+        buildWhen: (previous, current) {
+          return previous.lastModified != current.lastModified;
+        },
+        builder: (context, state) {
+          return ListView.builder(
+            itemBuilder: (context, index) {
+              final bill =
+                  state.objectMap![state.orderedSequence![index].toString()]!;
+              return BillCard(
+                key: ValueKey(bill.id),
+                bill: bill,
+                showModalHandler: _showBillModal,
+              );
+            },
+            itemCount: state.inStateCount,
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showBillModal(context),
