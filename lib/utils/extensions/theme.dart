@@ -18,9 +18,9 @@ extension CustomColorScheme on ColorScheme {
       ? darkColorPalette.cardSubtextColor
       : lightColorPalette.cardSubtextColor;
 
-  Color get bottomSheetModalBackground => _darkThemeEnabled
-      ? darkColorPalette.bottomSheetModalBackgroundColor
-      : lightColorPalette.bottomSheetModalBackgroundColor;
+  Color get modalBackground => _darkThemeEnabled
+      ? darkColorPalette.modalBackgroundColor
+      : lightColorPalette.modalBackgroundColor;
 
   Color get cupertinoPickerItemText => _darkThemeEnabled
       ? darkColorPalette.cupertinoPickerItemTextColor

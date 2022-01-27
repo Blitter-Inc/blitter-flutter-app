@@ -5,6 +5,7 @@ import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/constants.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
+import 'package:blitter_flutter_app/utils/extensions.dart';
 import './widgets/widgets.dart';
 
 class BillManagerScreen extends StatelessWidget {
@@ -29,14 +30,19 @@ class BillManagerScreen extends StatelessWidget {
   }
 
   void _showFilterModal(BuildContext context) {
-    showModalBottomSheet(
+    showDialog(
       context: context,
       builder: (_) => BlocProvider.value(
         value: context.read<BillManagerCubit>(),
-        child: const BillFilterModal(),
+        child: Dialog(
+          child: const BillFilterModal(),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.modalBackground,
+        ),
       ),
       barrierColor: Colors.black87,
-      isScrollControlled: true,
     );
   }
 

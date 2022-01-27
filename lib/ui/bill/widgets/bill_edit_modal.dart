@@ -128,7 +128,7 @@ class _BillEditModalState extends State<BillEditModal>
             bottom: 0,
             child: Container(
               height: 100,
-              color: colorScheme.bottomSheetModalBackground,
+              color: colorScheme.modalBackground,
               width: mediaQuery.size.width,
               child: Column(
                 children: [
