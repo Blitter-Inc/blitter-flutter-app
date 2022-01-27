@@ -5,13 +5,13 @@ import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/constants.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
-import 'package:blitter_flutter_app/utils/extensions.dart';
 import './widgets/widgets.dart';
 
 class BillManagerScreen extends StatelessWidget {
-  const BillManagerScreen({Key? key}) : super(key: key);
+  BillManagerScreen({Key? key}) : super(key: key);
 
   static const route = '/bill_manager';
+  final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
   void _showBillModal(BuildContext context, {String? billId}) {
     showModalBottomSheet(
@@ -42,60 +42,70 @@ class BillManagerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final cubit = context.read<BillManagerCubit>();
+
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          BillManagerAppBar(
-            showFilterModalHandler: _showFilterModal,
-            showBillModalHandler: _showBillModal,
-          ),
-          BlocBuilder<BillBloc, BillState>(
-            buildWhen: (previous, current) {
-              return previous.lastModified != current.lastModified;
-            },
-            builder: (context, blocState) {
-              return BlocBuilder<BillManagerCubit, BillManagerState>(
-                buildWhen: (previous, current) =>
-                    previous.lastBuildTimestamp != current.lastBuildTimestamp,
-                builder: (context, cubitState) {
-                  List<int> sequence = blocState.orderedSequence!;
-                  if (cubitState.filtersEnabled) {
-                    sequence = sequence.where((element) {
-                      final bill = blocState.objectMap![element.toString()]!;
-                      if (cubitState.statusFilter != '' &&
-                          cubitState.statusFilter != bill.status) {
-                        return false;
-                      } else if (cubitState.typeFilter.isNotEmpty &&
-                          !cubitState.typeFilter.contains(bill.type)) {
-                        return false;
-                      } else {
-                        return true;
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: cubit.refreshBillState,
+        displacement: 10,
+        edgeOffset: 60 + mediaQuery.viewPadding.top,
+        child: CustomScrollView(
+          slivers: [
+            BillManagerAppBar(
+              refreshIndicatorKey: _refreshIndicatorKey,
+              showFilterModalHandler: _showFilterModal,
+              showBillModalHandler: _showBillModal,
+            ),
+            BlocBuilder<BillBloc, BillState>(
+              buildWhen: (previous, current) {
+                return previous.lastModified != current.lastModified;
+              },
+              builder: (context, blocState) {
+                return BlocBuilder<BillManagerCubit, BillManagerState>(
+                  buildWhen: (previous, current) =>
+                      previous.lastBuildTimestamp != current.lastBuildTimestamp,
+                  builder: (context, cubitState) {
+                    List<int> sequence = blocState.orderedSequence!;
+                    if (cubitState.filtersEnabled) {
+                      sequence = sequence.where((element) {
+                        final bill = blocState.objectMap![element.toString()]!;
+                        if (cubitState.statusFilter != '' &&
+                            cubitState.statusFilter != bill.status) {
+                          return false;
+                        } else if (cubitState.typeFilter.isNotEmpty &&
+                            !cubitState.typeFilter.contains(bill.type)) {
+                          return false;
+                        } else {
+                          return true;
+                        }
+                      }).toList();
+                      if (cubitState.orderingFilter ==
+                          FetchAPIOrdering.lastUpdatedAtAsc) {
+                        sequence = sequence.reversed.toList();
                       }
-                    }).toList();
-                    if (cubitState.orderingFilter ==
-                        FetchAPIOrdering.lastUpdatedAtAsc) {
-                      sequence = sequence.reversed.toList();
                     }
-                  }
-                  return SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final bill =
-                            blocState.objectMap![sequence[index].toString()]!;
-                        return BillCard(
-                          key: ValueKey(bill.id),
-                          bill: bill,
-                          showModalHandler: _showBillModal,
-                        );
-                      },
-                      childCount: sequence.length,
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ],
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final bill =
+                              blocState.objectMap![sequence[index].toString()]!;
+                          return BillCard(
+                            key: ValueKey(bill.id),
+                            bill: bill,
+                            showModalHandler: _showBillModal,
+                          );
+                        },
+                        childCount: sequence.length,
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -104,10 +114,12 @@ class BillManagerScreen extends StatelessWidget {
 class BillManagerAppBar extends StatelessWidget {
   const BillManagerAppBar({
     Key? key,
+    required this.refreshIndicatorKey,
     required this.showFilterModalHandler,
     required this.showBillModalHandler,
   }) : super(key: key);
 
+  final GlobalKey<RefreshIndicatorState> refreshIndicatorKey;
   final Function(BuildContext) showFilterModalHandler;
   final Function(BuildContext) showBillModalHandler;
 
@@ -175,20 +187,8 @@ class BillManagerAppBar extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          onPressed: context.showColorPickerSheet,
-          icon: const Icon(Icons.color_lens),
-        ),
-        IconButton(
-          icon: BlocBuilder<ConfigBloc, ConfigState>(
-            buildWhen: (previous, current) =>
-                previous.darkModeEnabled != current.darkModeEnabled,
-            builder: (_, state) => Icon(
-              state.darkModeEnabled ? Icons.mode_night : Icons.wb_sunny,
-            ),
-          ),
-          onPressed: () {
-            context.switchThemeMode();
-          },
+          onPressed: () => refreshIndicatorKey.currentState!.show(),
+          icon: const Icon(Icons.refresh),
         ),
         IconButton(
           onPressed: () {},
