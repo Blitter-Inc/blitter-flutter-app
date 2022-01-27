@@ -20,6 +20,24 @@ class DashboardScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: context.showColorPickerSheet,
+            icon: const Icon(Icons.color_lens),
+          ),
+          IconButton(
+            icon: BlocBuilder<ConfigBloc, ConfigState>(
+              buildWhen: (previous, current) =>
+                  previous.darkModeEnabled != current.darkModeEnabled,
+              builder: (_, state) => Icon(
+                state.darkModeEnabled ? Icons.mode_night : Icons.wb_sunny,
+              ),
+            ),
+            onPressed: () {
+              context.switchThemeMode();
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -45,16 +63,6 @@ class DashboardScreen extends StatelessWidget {
                   BillManagerScreen.route,
                 );
               },
-            ),
-            const SizedBox(height: 10),
-            OutlinedButton(
-              child: const Text('Toggle Theme Mode'),
-              onPressed: context.switchThemeMode,
-            ),
-            const SizedBox(height: 10),
-            OutlinedButton(
-              child: const Text('Open Color Picker'),
-              onPressed: context.showColorPickerSheet,
             ),
             const SizedBox(height: 10),
             OutlinedButton(
