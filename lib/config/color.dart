@@ -17,7 +17,7 @@ abstract class ThemeColorPalette {
   Color get cardColor;
   Color get cardTextColor;
   Color get cardSubtextColor;
-  Color get bottomSheetModalBackgroundColor;
+  Color get modalBackgroundColor;
   Color get appBarForegroundColor;
   Color get appBarBackgroundColor;
   Color get appBarShadowColor;
@@ -38,18 +38,16 @@ class LightThemeColorPalette implements ThemeColorPalette {
   Color get cardSubtextColor => Colors.black54;
 
   @override
-  Color get bottomSheetModalBackgroundColor =>
-      const Color.fromRGBO(235, 235, 235, 1);
+  Color get modalBackgroundColor => const Color.fromRGBO(235, 235, 235, 1);
 
   @override
   Color get appBarForegroundColor => Colors.black;
 
   @override
   Color get appBarBackgroundColor => Colors.grey[50]!;
-  
+
   @override
   Color get appBarShadowColor => Colors.black;
-  
 
   @override
   Color get snackBarContentTextColor => Colors.black;
@@ -75,18 +73,16 @@ class DarkThemeColorPalette implements ThemeColorPalette {
   Color get cardSubtextColor => Colors.white60;
 
   @override
-  Color get bottomSheetModalBackgroundColor =>
-      const Color.fromRGBO(30, 30, 30, 1);
+  Color get modalBackgroundColor => const Color.fromRGBO(30, 30, 30, 1);
 
   @override
   Color get appBarForegroundColor => Colors.white;
 
   @override
   Color get appBarBackgroundColor => Colors.black;
-  
+
   @override
   Color get appBarShadowColor => Colors.white24;
-  
 
   @override
   Color get snackBarContentTextColor => Colors.black;

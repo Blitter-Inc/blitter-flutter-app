@@ -22,7 +22,7 @@ ThemeData generateThemeDataFromPalette({
     scaffoldBackgroundColor: palette.scaffoldBackgroundColor,
     cardColor: palette.cardColor,
     bottomSheetTheme: themeData.bottomSheetTheme.copyWith(
-      modalBackgroundColor: palette.bottomSheetModalBackgroundColor,
+      modalBackgroundColor: palette.modalBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10),
