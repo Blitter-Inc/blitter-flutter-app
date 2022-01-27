@@ -25,4 +25,6 @@ extension CustomColorScheme on ColorScheme {
   Color get cupertinoPickerItemText => _darkThemeEnabled
       ? darkColorPalette.cupertinoPickerItemTextColor
       : lightColorPalette.cupertinoPickerItemTextColor;
+
+  Color get disabledChipText => _darkThemeEnabled ? Colors.white : Colors.black;
 }

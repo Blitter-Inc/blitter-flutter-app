@@ -39,4 +39,13 @@ class BillType {
     _outing[1],
     _miscelleneous[1],
   ];
+
+  static final displayValueMap = <String, String>{
+    _none[0]: _none[1],
+    _entertainment[0]: _entertainment[1],
+    _food[0]: _food[1],
+    _shopping[0]: _shopping[1],
+    _outing[0]: _outing[1],
+    _miscelleneous[0]: _miscelleneous[1],
+  };
 }

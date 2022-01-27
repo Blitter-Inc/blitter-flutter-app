@@ -6,8 +6,8 @@ import 'package:blitter_flutter_app/utils/extensions.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/models.dart';
 import './amount_input.dart';
+import './bottom_modal_button.dart';
 import './description_input.dart';
-import './bottom_modal_submit_button.dart';
 import './bill_action.dart';
 import './bill_name_input.dart';
 import './bill_type_picker.dart';
@@ -133,9 +133,10 @@ class _BillEditModalState extends State<BillEditModal>
               child: Column(
                 children: [
                   const BillAction(),
-                  BottomModalSubmitButton(
-                      onSubmit: () =>
-                          _onSubmit(context.read<BillModalCubit>())),
+                  BottomModalButton(
+                    label: 'Save',
+                    onPressed: () => _onSubmit(context.read<BillModalCubit>()),
+                  ),
                 ],
               ),
             ),
