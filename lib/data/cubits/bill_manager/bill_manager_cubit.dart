@@ -5,10 +5,6 @@ import './bill_manager_state.dart';
 class BillManagerCubit extends Cubit<BillManagerState> {
   BillManagerCubit() : super(BillManagerState.init());
 
-  String get orderingFilter => state.filters['ordering'];
-  String get statusFilter => state.filters['status'];
-  Set<String> get typeFilter => state.filters['type'];
-
   void setOrderingFilter(String ordering) {
     emit(state.copyWith(
         filters: state.filters..update('ordering', (_) => ordering)));
@@ -35,7 +31,10 @@ class BillManagerCubit extends Cubit<BillManagerState> {
   }
 
   void enableFilters() {
-    emit(state.copyWith(filtersEnabled: true));
+    emit(state.copyWith(
+      filtersEnabled: true,
+      lastBuildTimestamp: DateTime.now().microsecondsSinceEpoch,
+    ));
   }
 
   void clearFilters() {
