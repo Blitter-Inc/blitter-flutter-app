@@ -23,12 +23,25 @@ ThemeData generateThemeDataFromPalette({
     cardColor: palette.cardColor,
     bottomSheetTheme: themeData.bottomSheetTheme.copyWith(
       modalBackgroundColor: palette.bottomSheetModalBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10),
+        ),
+      ),
     ),
     appBarTheme: themeData.appBarTheme.copyWith(
       elevation: 0,
       foregroundColor: palette.appBarForegroundColor,
       backgroundColor: palette.appBarBackgroundColor,
       shadowColor: palette.appBarShadowColor,
+    ),
+    chipTheme: themeData.chipTheme.copyWith(
+      selectedColor: primary,
+      checkmarkColor: Colors.black,
+      labelStyle: const TextStyle(
+        fontSize: 12,
+        color: Colors.black,
+      ),
     ),
   );
 }

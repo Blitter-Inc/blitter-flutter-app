@@ -22,10 +22,17 @@ class BillManagerScreen extends StatelessWidget {
         ),
         child: BillModal(billId: billId),
       ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10),
-        ),
+      barrierColor: Colors.black87,
+      isScrollControlled: true,
+    );
+  }
+
+  void _showFilterModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => BlocProvider.value(
+        value: context.read<BillManagerCubit>(),
+        child: const BillFilterModal(),
       ),
       barrierColor: Colors.black87,
       isScrollControlled: true,
@@ -68,7 +75,7 @@ class BillManagerScreen extends StatelessWidget {
                     child: Row(
                       children: [
                         OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _showFilterModal(context),
                           icon: const Icon(Icons.filter_alt, size: 16),
                           label: const Text('Filter'),
                           style: OutlinedButton.styleFrom(

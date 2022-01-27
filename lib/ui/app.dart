@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
+import 'package:blitter_flutter_app/data/cubits.dart';
 import './ui.dart';
 
 class BlitterApp extends StatelessWidget {
@@ -52,18 +53,20 @@ class BlitterApp extends StatelessWidget {
             },
             DashboardScreen.route: (_) => const DashboardScreen(),
             BillManagerScreen.route: (ctx) {
-              final themeData = Theme.of(ctx);
-              return BlocBuilder<ConfigBloc, ConfigState>(
-                builder: (context, state) {
-                  return Theme(
-                    data: generateModuleThemeData(
-                      defaultThemeData: themeData,
-                      modulePrimaryColor: state.billPrimaryColor,
-                    ),
-                    child: const BillManagerScreen(),
-                  );
-                },
-              );
+              return BlocProvider<BillManagerCubit>(
+                  create: (_) => BillManagerCubit(),
+                  child: BlocBuilder<ConfigBloc, ConfigState>(
+                    builder: (context, state) {
+                      final themeData = Theme.of(ctx);
+                      return Theme(
+                        data: generateModuleThemeData(
+                          defaultThemeData: themeData,
+                          modulePrimaryColor: state.billPrimaryColor,
+                        ),
+                        child: const BillManagerScreen(),
+                      );
+                    },
+                  ));
             },
           },
           debugShowCheckedModeBanner: false,
