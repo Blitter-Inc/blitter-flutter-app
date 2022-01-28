@@ -92,20 +92,22 @@ class BillManagerScreen extends StatelessWidget {
                         sequence = sequence.reversed.toList();
                       }
                     }
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final bill =
-                              blocState.objectMap![sequence[index].toString()]!;
-                          return BillCard(
-                            key: ValueKey(bill.id),
-                            bill: bill,
-                            showModalHandler: _showBillModal,
-                          );
-                        },
-                        childCount: sequence.length,
-                      ),
-                    );
+                    return sequence.isNotEmpty
+                        ? SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                final bill = blocState
+                                    .objectMap![sequence[index].toString()]!;
+                                return BillCard(
+                                  key: ValueKey(bill.id),
+                                  bill: bill,
+                                  showModalHandler: _showBillModal,
+                                );
+                              },
+                              childCount: sequence.length,
+                            ),
+                          )
+                        : const NoBillFound();
                   },
                 );
               },
