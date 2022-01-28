@@ -6,10 +6,12 @@ class BottomModalButton extends StatefulWidget {
     Key? key,
     required this.label,
     required this.onPressed,
+    required this.validate,
   }) : super(key: key);
 
   final String label;
   final AsyncCallback onPressed;
+  final Future<bool> Function() validate;
 
   @override
   State<BottomModalButton> createState() => _BottomModalButtonState();
@@ -24,12 +26,19 @@ class _BottomModalButtonState extends State<BottomModalButton> {
       height: 50,
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: () async {
           if (_enabled) {
             setState(() {
               _enabled = false;
             });
-            widget.onPressed();
+            final isValid = await widget.validate();
+            if (isValid) {
+              widget.onPressed();
+            } else {
+              setState(() {
+                _enabled = true;
+              });
+            }
           }
         },
         child: _enabled
