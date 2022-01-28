@@ -222,9 +222,9 @@ class SigninCubit extends Cubit<SigninState> {
   Future<void> initializeApp() async {
     await Future.wait([
       _updateProfile(),
-      _syncContacts(),
       _syncBills(),
     ]);
+    await _syncContacts();
     initializationCompleteHandler();
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -94,6 +96,73 @@ class BillCard extends StatelessWidget {
                       ),
                     ],
                   ],
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 26,
+                  alignment: Alignment.topRight,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      if (bill.subscribers.length > 1)
+                        ...bill.subscribers
+                            .sublist(0, min(bill.subscribers.length, 2))
+                            .asMap()
+                            .map(
+                              (i, subscriber) => MapEntry(
+                                i,
+                                Positioned(
+                                  right: bill.subscribers.length > 1
+                                      ? (i * 18) + 10
+                                      : (i * 18),
+                                  child: CircleAvatar(
+                                    radius: 13,
+                                    child: ClipOval(
+                                      child: Image.network(
+                                        contactBloc
+                                            .getUserById(subscriber.user)!
+                                            .avatar!,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                CircleAvatar(
+                                          backgroundColor: colorScheme.primary,
+                                          child: Text(
+                                            contactBloc
+                                                .getUserById(subscriber.user)!
+                                                .name![0],
+                                            style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.black),
+                                          ),
+                                          radius: 13,
+                                        ),
+                                        fit: BoxFit.cover,
+                                        height: 26,
+                                        width: 26,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                            .values
+                            .toList(),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: CircleAvatar(
+                          radius: 8,
+                          child: Text(
+                            '+${(bill.subscribers.length - 2).toString()}',
+                            style: const TextStyle(
+                              fontSize: 9,
+                            ),
+                          ),
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const Spacer(),
                 Row(
