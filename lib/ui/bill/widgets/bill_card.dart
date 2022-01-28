@@ -30,22 +30,23 @@ class BillCard extends StatelessWidget {
     return Container(
       height: 110,
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-      child: Stack(
-        children: [
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: context.billCardBorderRadius,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: context.billCardBorderRadius,
+        ),
+        elevation: 5,
+        shadowColor: Colors.grey.shade600,
+        child: InkWell(
+          borderRadius: context.billCardBorderRadius,
+          onTap: () => showModalHandler(context, billId: bill.id.toString()),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 8,
+              horizontal: 12,
             ),
-            elevation: 5,
-            shadowColor: Colors.grey.shade600,
-            child: InkWell(
-              borderRadius: context.billCardBorderRadius,
-              onTap: () =>
-                  showModalHandler(context, billId: bill.id.toString()),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                child: Column(
+            child: Stack(
+              children: [
+                Column(
                   children: [
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,15 +120,11 @@ class BillCard extends StatelessWidget {
                     )
                   ],
                 ),
-              ),
+                BillCardSubscribers(bill: bill),
+              ],
             ),
           ),
-          Positioned(
-            child: BillCardSubscribers(bill: bill),
-            top: 43,
-            right: 15,
-          ),
-        ],
+        ),
       ),
     );
   }
