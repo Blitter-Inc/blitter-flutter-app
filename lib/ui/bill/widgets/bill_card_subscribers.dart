@@ -1,9 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/models.dart';
+import 'package:blitter_flutter_app/utils/extensions.dart';
+import './user_avatar_placeholder.dart';
 
 class BillCardSubscribers extends StatelessWidget {
   const BillCardSubscribers({
@@ -18,67 +21,71 @@ class BillCardSubscribers extends StatelessWidget {
     final contactBloc = context.read<ContactBloc>();
     final colorScheme = Theme.of(context).colorScheme;
 
-    return SizedBox(
-      width: 100,
-      height: 30,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          ...bill.subscribers
-              .sublist(0, min(bill.subscribers.length, 2))
-              .asMap()
-              .map(
-                (i, subscriber) => MapEntry(
+    return Stack(
+      alignment: Alignment.centerRight,
+      children: [
+        ...bill.subscribers
+            .sublist(0, min(bill.subscribers.length, 2))
+            .asMap()
+            .map(
+              (i, subscriber) {
+                final user = contactBloc.getUserById(subscriber.user);
+
+                return MapEntry(
                   i,
                   Positioned(
                     right:
-                        bill.subscribers.length > 1 ? (i * 20) + 10 : (i * 20),
-                    child: CircleAvatar(
-                      radius: 15,
-                      child: ClipOval(
-                        child: Image.network(
-                          contactBloc.getUserById(subscriber.user)!.avatar!,
-                          errorBuilder: (context, error, stackTrace) =>
-                              CircleAvatar(
-                            backgroundColor: colorScheme.primary,
-                            child: Text(
-                              contactBloc
-                                  .getUserById(subscriber.user)!
-                                  .name![0],
-                              style: const TextStyle(
-                                  fontSize: 15, color: Colors.black),
+                        bill.subscribers.length > 1 ? (i * 20) + 7 : (i * 20),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: CircleAvatar(
+                        backgroundColor: colorScheme.primary,
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            fadeOutDuration: const Duration(milliseconds: 250),
+                            imageUrl: user!.avatar!,
+                            fit: BoxFit.cover,
+                            height: 36,
+                            width: 36,
+                            placeholder: (context, url) =>
+                                UserAvatarPlaceholder(
+                              initialAlphabet: user.name![0],
+                              size: 15,
                             ),
-                            radius: 15,
+                            errorWidget: (context, url, error) =>
+                                UserAvatarPlaceholder(
+                              initialAlphabet: user.name![0],
+                              size: 15,
+                            ),
                           ),
-                          fit: BoxFit.cover,
-                          height: 30,
-                          width: 30,
                         ),
                       ),
                     ),
                   ),
-                ),
-              )
-              .values
-              .toList(),
-          if (bill.subscribers.length > 1)
-            Positioned(
-              right: 0,
-              bottom: 0,
+                );
+              },
+            )
+            .values
+            .toList(),
+        if (bill.subscribers.length > 2)
+          Positioned(
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 32),
               child: CircleAvatar(
                 radius: 9,
                 child: Text(
-                  '+${(bill.subscribers.length - 2).toString()}',
+                  '+${bill.subscribers.length - 2}',
                   style: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 9.5,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                backgroundColor: Colors.white,
+                backgroundColor: colorScheme.cardText,
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }
