@@ -11,19 +11,28 @@ class BillViewModal extends StatelessWidget {
     Key? key,
     required this.bill,
     required this.toggleEdit,
+    required this.hasEditPermission,
   }) : super(key: key);
 
   final Bill bill;
   final AsyncCallback toggleEdit;
+  final bool Function({
+    required BuildContext context,
+    required int createdBy,
+  }) hasEditPermission;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final editToggleEnabled = hasEditPermission(
+      context: context,
+      createdBy: bill.createdBy,
+    );
 
     return Stack(
       children: [
         Container(
-          margin: const EdgeInsets.only(bottom: 50),
+          margin: EdgeInsets.only(bottom: editToggleEnabled ? 50 : 10),
           padding: const EdgeInsets.only(top: 7),
           child: SingleChildScrollView(
             padding: const EdgeInsets.only(
@@ -103,7 +112,7 @@ class BillViewModal extends StatelessWidget {
           ),
         ),
         BillTypeBadge(type: bill.type),
-        BillEditToggle(onTap: toggleEdit),
+        if (editToggleEnabled) BillEditToggle(onTap: toggleEdit),
       ],
     );
   }
