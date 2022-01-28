@@ -26,5 +26,11 @@ extension CustomColorScheme on ColorScheme {
       ? darkColorPalette.cupertinoPickerItemTextColor
       : lightColorPalette.cupertinoPickerItemTextColor;
 
+  Color get progressBarContainer =>
+      _darkThemeEnabled ? Colors.grey[850]! : Colors.black26;
+
+  Color get progressBarEmptyText =>
+      _darkThemeEnabled ? Colors.grey : Colors.grey.shade800;
+
   Color get disabledChipText => _darkThemeEnabled ? Colors.white : Colors.black;
 }
