@@ -38,21 +38,25 @@ class BillCardSubscribers extends StatelessWidget {
                         bill.subscribers.length > 1 ? (i * 20) + 7 : (i * 20),
                     child: Padding(
                       padding: const EdgeInsets.only(top: 5),
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          fadeOutDuration: const Duration(milliseconds: 250),
-                          imageUrl: user!.avatar!,
-                          fit: BoxFit.cover,
-                          height: 36,
-                          width: 36,
-                          placeholder: (context, url) => UserAvatarPlaceholder(
-                            initialAlphabet: user.name![0],
-                            size: 15,
-                          ),
-                          errorWidget: (context, url, error) =>
-                              UserAvatarPlaceholder(
-                            initialAlphabet: user.name![0],
-                            size: 15,
+                      child: CircleAvatar(
+                        backgroundColor: colorScheme.primary,
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            fadeOutDuration: const Duration(milliseconds: 250),
+                            imageUrl: user!.avatar!,
+                            fit: BoxFit.cover,
+                            height: 36,
+                            width: 36,
+                            placeholder: (context, url) =>
+                                UserAvatarPlaceholder(
+                              initialAlphabet: user.name![0],
+                              size: 15,
+                            ),
+                            errorWidget: (context, url, error) =>
+                                UserAvatarPlaceholder(
+                              initialAlphabet: user.name![0],
+                              size: 15,
+                            ),
                           ),
                         ),
                       ),
