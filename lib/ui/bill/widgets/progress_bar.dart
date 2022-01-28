@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+import 'package:blitter_flutter_app/utils/extensions.dart';
+
 class ProgressBar extends StatefulWidget {
   const ProgressBar({
     Key? key,
@@ -45,16 +47,13 @@ class _ProgressBarState extends State<ProgressBar> {
     final progressBarWidth = mediaQuery.size.width - 30;
 
     return Stack(
-      alignment: _progressBarWidthFactor > 0.12
-          ? AlignmentDirectional.topStart
-          : AlignmentDirectional.center,
       children: [
         Container(
           height: 20,
           width: progressBarWidth,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25),
-            color: Colors.grey[850],
+            color: colorScheme.progressBarContainer,
           ),
         ),
         ClipRRect(
@@ -85,7 +84,6 @@ class _ProgressBarState extends State<ProgressBar> {
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 11.5,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -94,13 +92,16 @@ class _ProgressBarState extends State<ProgressBar> {
           ),
         ),
         if (_progressBarWidthFactor <= 0.12)
-          const Text(
-            'Nothing significant yet',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 11.5,
-              fontWeight: FontWeight.bold,
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                '$_progressBarPercentage%',
+                style: TextStyle(
+                  color: colorScheme.progressBarEmptyText,
+                  fontSize: 11.5,
+                ),
+              ),
             ),
           ),
       ],
