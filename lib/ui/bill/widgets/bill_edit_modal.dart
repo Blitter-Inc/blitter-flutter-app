@@ -49,6 +49,8 @@ class _BillEditModalState extends State<BillEditModal>
     _input.type = type;
   }
 
+  Future<bool> _validate() async => _input.isValid();
+
   Future<void> _onSubmit(BillModalCubit cubit) async {
     _toggleLoading();
     if (widget.bill != null) {
@@ -136,6 +138,7 @@ class _BillEditModalState extends State<BillEditModal>
                   BottomModalButton(
                     label: 'Save',
                     onPressed: () => _onSubmit(context.read<BillModalCubit>()),
+                    validate: _validate,
                   ),
                 ],
               ),

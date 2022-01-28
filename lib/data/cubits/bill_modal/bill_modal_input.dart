@@ -58,4 +58,12 @@ class BillModalInput {
     amountController.dispose();
     descriptionController.dispose();
   }
+
+  bool isValid() {
+    final amount = double.tryParse(amountController.text);
+    return amount != null &&
+        amount > 0 &&
+        nameController.text.isNotEmpty &&
+        type.isNotEmpty;
+  }
 }
