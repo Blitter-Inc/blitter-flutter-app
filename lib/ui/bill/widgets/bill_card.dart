@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/models.dart' show Bill;
 import 'package:blitter_flutter_app/utils/extensions.dart';
+import './bill_card_subscribers.dart';
 
 class BillCard extends StatelessWidget {
   final Bill bill;
@@ -31,157 +30,104 @@ class BillCard extends StatelessWidget {
     return Container(
       height: 110,
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: context.billCardBorderRadius,
-        ),
-        elevation: 5,
-        shadowColor: Colors.grey.shade600,
-        child: InkWell(
-          borderRadius: context.billCardBorderRadius,
-          onTap: () => showModalHandler(context, billId: bill.id.toString()),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: Column(
-              children: [
-                Row(
+      child: Stack(
+        children: [
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: context.billCardBorderRadius,
+            ),
+            elevation: 5,
+            shadowColor: Colors.grey.shade600,
+            child: InkWell(
+              borderRadius: context.billCardBorderRadius,
+              onTap: () =>
+                  showModalHandler(context, billId: bill.id.toString()),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Column(
                   children: [
-                    SizedBox(
-                      width: 150,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '# ${bill.name}',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: TextStyle(
-                              color: colorScheme.cardText,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 1,
-                          ),
-                          Text(
-                            ':${bill.type.toUpperCase()}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      isFulfilled
-                          ? '₹ ${bill.amount}'
-                          : '₹ ${bill.settledAmt} / ${bill.amount}',
-                      style: TextStyle(
-                        color: isFulfilled ? Colors.green : Colors.red.shade900,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (isFulfilled) ...[
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                      ),
-                    ],
-                  ],
-                ),
-                Container(
-                  width: double.infinity,
-                  height: 26,
-                  alignment: Alignment.topRight,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      ...bill.subscribers
-                          .sublist(0, min(bill.subscribers.length, 2))
-                          .asMap()
-                          .map(
-                            (i, subscriber) => MapEntry(
-                              i,
-                              Positioned(
-                                right: bill.subscribers.length > 2
-                                    ? (i * 18) + 10
-                                    : (i * 18),
-                                child: CircleAvatar(
-                                  radius: 13,
-                                  child: ClipOval(
-                                    child: Image.network(
-                                      contactBloc
-                                          .getUserById(subscriber.user)!
-                                          .avatar!,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              CircleAvatar(
-                                        backgroundColor: colorScheme.primary,
-                                        child: Text(
-                                          contactBloc
-                                              .getUserById(subscriber.user)!
-                                              .name![0],
-                                          style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.black),
-                                        ),
-                                        radius: 13,
-                                      ),
-                                      fit: BoxFit.cover,
-                                      height: 26,
-                                      width: 26,
-                                    ),
-                                  ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 150,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '# ${bill.name}',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                  color: colorScheme.cardText,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                          )
-                          .values
-                          .toList(),
-                      if (bill.subscribers.length > 2)
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: CircleAvatar(
-                            radius: 8,
-                            child: Text(
-                              '+${(bill.subscribers.length - 2).toString()}',
-                              style: const TextStyle(
-                                fontSize: 9,
+                              const SizedBox(
+                                height: 1,
                               ),
-                            ),
-                            backgroundColor: Colors.white,
+                              Text(
+                                ':${bill.type.toUpperCase()}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.primary,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                Row(
-                  children: [
-                    Text(
-                      'By: ${contactBloc.getUserById(bill.createdBy)?.name}',
-                      style: subtextStyle,
+                        const Spacer(),
+                        Text(
+                          isFulfilled
+                              ? '₹ ${bill.amount}'
+                              : '₹ ${bill.settledAmt} / ${bill.amount}',
+                          style: TextStyle(
+                            color: isFulfilled
+                                ? Colors.green
+                                : Colors.red.shade900,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (isFulfilled) ...[
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                          ),
+                        ],
+                      ],
                     ),
                     const Spacer(),
-                    Text(
-                      'Updated: ${context.getBillLastUpdatedAt(bill.lastUpdatedAt)}',
-                      style: subtextStyle,
-                    ),
+                    Row(
+                      children: [
+                        Text(
+                          'By: ${contactBloc.getUserById(bill.createdBy)?.name}',
+                          style: subtextStyle,
+                        ),
+                        const Spacer(),
+                        Text(
+                          'Updated: ${context.getBillLastUpdatedAt(bill.lastUpdatedAt)}',
+                          style: subtextStyle,
+                        ),
+                      ],
+                    )
                   ],
-                )
-              ],
+                ),
+              ),
             ),
           ),
-        ),
+          Positioned(
+            child: BillCardSubscribers(bill: bill),
+            top: 43,
+            right: 15,
+          ),
+        ],
       ),
     );
   }
