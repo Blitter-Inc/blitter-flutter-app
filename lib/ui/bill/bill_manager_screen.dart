@@ -146,7 +146,7 @@ class BillManagerAppBar extends StatelessWidget {
       pinned: true,
       snap: true,
       stretch: true,
-      elevation: 4,
+      elevation: 1,
       bottom: PreferredSize(
         preferredSize: const Size(double.infinity, 60),
         child: Container(
