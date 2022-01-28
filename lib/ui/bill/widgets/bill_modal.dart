@@ -33,6 +33,14 @@ class _BillModalState extends State<BillModal>
     _modalOpacityController.forward();
   }
 
+  bool _hasEditPermission({
+    required BuildContext context,
+    required int createdBy,
+  }) {
+    final userId = context.read<AuthBloc>().state.user?.id;
+    return createdBy == userId;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -96,6 +104,7 @@ class _BillModalState extends State<BillModal>
                     ? BillViewModal(
                         bill: bill!,
                         toggleEdit: _toggleEdit,
+                        hasEditPermission: _hasEditPermission,
                       )
                     : BillEditModal(
                         bill: bill,
