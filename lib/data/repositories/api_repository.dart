@@ -31,6 +31,10 @@ class ApiURI {
     return _generateUri('bill-manager/bill/fetch/', params: params);
   }
 
+  static Uri fetchRequestedBills() {
+    return _generateUri('bill-manager/bill/fetch-requested/');
+  }
+
   static Uri createBill() {
     return _generateUri('bill-manager/bill/');
   }
@@ -122,6 +126,16 @@ class APIRepository extends IAPIRepository {
         },
       ),
       headers: _getAuthHeaders(),
+    );
+    return response;
+  }
+
+  @override
+  Future<http.Response> fetchRequestedBills(JsonMap payload) async {
+    var response = await http.post(
+      ApiURI.fetchRequestedBills(),
+      headers: _getHeaders(),
+      body: jsonEncode(payload),
     );
     return response;
   }

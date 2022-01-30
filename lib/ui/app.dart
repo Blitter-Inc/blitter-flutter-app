@@ -69,7 +69,7 @@ class BlitterApp extends StatelessWidget {
                           defaultThemeData: themeData,
                           modulePrimaryColor: state.billPrimaryColor,
                         ),
-                        child: BillManagerScreen(),
+                        child: const BillManagerScreen(),
                       );
                     },
                   ));

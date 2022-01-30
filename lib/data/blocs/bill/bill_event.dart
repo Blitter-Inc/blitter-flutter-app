@@ -9,9 +9,19 @@ class InitializeBillState extends BillEvent {
 }
 
 class RefreshBillState extends BillEvent {
-  RefreshBillState({required this.json});
+  RefreshBillState({
+    required this.json,
+    this.callback,
+  });
 
   final Map<String, dynamic> json;
+  final Function? callback;
+}
+
+class AppendFetchedBills extends BillEvent {
+  AppendFetchedBills({required this.objectMapJson});
+
+  final Map<String, dynamic> objectMapJson;
 }
 
 class AddBill extends BillEvent {

@@ -107,7 +107,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 684ee790a24f73ebb2d1d966e9711c203f2a4237
   GTMSessionFetcher: 43748f93435c2aa068b1cbe39655aaf600652e91
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
-  path_provider_macos: 160cab0d5461f0c0e02995469a98f24bdb9a3f1f
+  path_provider_macos: a0a3fd666cb7cd0448e936fb4abad4052961002b
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   sqflite: a5789cceda41d54d23f31d6de539d65bb14100ea
 

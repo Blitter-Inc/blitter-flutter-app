@@ -21,7 +21,7 @@ class BillState {
     this.lastModified,
   });
 
-  Map<String, Bill> _generateObjectMapFromAPIJson(JsonMap objectMapJson) {
+  Map<String, Bill> generateObjectMapFromAPIJson(JsonMap objectMapJson) {
     return objectMapJson.map(
       (key, value) => MapEntry(key, Bill.fromAPIJson(value)),
     );
@@ -34,7 +34,7 @@ class BillState {
         orderedSequence = json['ordered_sequence']!.cast<int>(),
         lastRefreshed = getCurrentDateTimeString(),
         lastModified = getCurrentDateTimeString() {
-    objectMap = _generateObjectMapFromAPIJson(json['object_map']!);
+    objectMap = generateObjectMapFromAPIJson(json['object_map']!);
   }
 
   BillState.fromJson(Map<String, dynamic> json)
@@ -88,12 +88,12 @@ class BillState {
     final newInStateCount =
         inStateCount + newObjectMapKeys.difference(oldObjectMapKeys).length;
 
-    orderedSequence!.removeWhere(
-        (element) => newObjectMapKeys.contains(element.toString()));
+    final orderedSequence = this.orderedSequence!.toList()
+      ..removeWhere((element) => newObjectMapKeys.contains(element.toString()));
     final newOrderedSequence = json['ordered_sequence']!.cast<int>()
-      ..addAll(orderedSequence!);
+      ..addAll(orderedSequence);
     final newObjectMap = objectMap!
-      ..addAll(_generateObjectMapFromAPIJson(json['object_map']!));
+      ..addAll(generateObjectMapFromAPIJson(json['object_map']!));
 
     return BillState(
       totalCount: json['total_count']!,
@@ -105,4 +105,6 @@ class BillState {
       lastModified: getCurrentDateTimeString(),
     );
   }
+
+  Bill? getBillById(int id) => objectMap![id.toString()];
 }

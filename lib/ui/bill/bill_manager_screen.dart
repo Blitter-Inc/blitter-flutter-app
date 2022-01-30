@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/constants.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
+import 'package:blitter_flutter_app/data/models.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
 import 'package:blitter_flutter_app/utils/extensions.dart';
 import './widgets/widgets.dart';
 
-class BillManagerScreen extends StatelessWidget {
-  BillManagerScreen({Key? key}) : super(key: key);
+class BillManagerScreen extends StatefulWidget {
+  const BillManagerScreen({Key? key}) : super(key: key);
 
   static const route = '/bill_manager';
+
+  @override
+  State<BillManagerScreen> createState() => _BillManagerScreenState();
+}
+
+class _BillManagerScreenState extends State<BillManagerScreen> {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  late PagingController<int, Bill> _pagingController;
+  late BillManagerCubit cubit;
 
   void _showBillModal(BuildContext context, {String? billId}) {
     showModalBottomSheet(
@@ -47,164 +57,92 @@ class BillManagerScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final cubit = context.read<BillManagerCubit>();
-
-    return Scaffold(
-      body: BlocBuilder<BillBloc, BillState>(
-        buildWhen: (previous, current) {
-          return previous.lastModified != current.lastModified;
-        },
-        builder: (context, blocState) {
-          return RefreshIndicator(
-            key: _refreshIndicatorKey,
-            onRefresh: () async => await cubit.refreshBillState(
-              lastRefreshed: blocState.lastRefreshed!,
-            ),
-            displacement: 10,
-            edgeOffset: 60 + mediaQuery.viewPadding.top,
-            child: CustomScrollView(
-              slivers: [
-                BillManagerAppBar(
-                  refreshIndicatorKey: _refreshIndicatorKey,
-                  showFilterModalHandler: _showFilterModal,
-                  showBillModalHandler: _showBillModal,
-                ),
-                BlocBuilder<BillManagerCubit, BillManagerState>(
-                  buildWhen: (previous, current) =>
-                      previous.lastBuildTimestamp != current.lastBuildTimestamp,
-                  builder: (context, cubitState) {
-                    List<int> sequence = blocState.orderedSequence!;
-                    if (cubitState.filtersEnabled) {
-                      sequence = sequence.where((element) {
-                        final bill = blocState.objectMap![element.toString()]!;
-                        if (cubitState.statusFilter != '' &&
-                            cubitState.statusFilter != bill.status) {
-                          return false;
-                        } else if (cubitState.typeFilter.isNotEmpty &&
-                            !cubitState.typeFilter.contains(bill.type)) {
-                          return false;
-                        } else {
-                          return true;
-                        }
-                      }).toList();
-                      if (cubitState.orderingFilter ==
-                          FetchAPIOrdering.lastUpdatedAtAsc) {
-                        sequence = sequence.reversed.toList();
-                      }
-                    }
-                    return sequence.isNotEmpty
-                        ? SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final bill = blocState
-                                    .objectMap![sequence[index].toString()]!;
-                                return BillCard(
-                                  key: ValueKey(bill.id),
-                                  bill: bill,
-                                  showModalHandler: _showBillModal,
-                                );
-                              },
-                              childCount: sequence.length,
-                            ),
-                          )
-                        : const NoBillFound();
-                  },
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+  void initState() {
+    super.initState();
+    _pagingController = PagingController(firstPageKey: 0);
+    _pagingController.addPageRequestListener((pageKey) async {
+      try {
+        cubit.fetchPage(pageKey: pageKey, controller: _pagingController);
+      } catch (error) {
+        _pagingController.error = error;
+      }
+    });
   }
-}
 
-class BillManagerAppBar extends StatelessWidget {
-  const BillManagerAppBar({
-    Key? key,
-    required this.refreshIndicatorKey,
-    required this.showFilterModalHandler,
-    required this.showBillModalHandler,
-  }) : super(key: key);
-
-  final GlobalKey<RefreshIndicatorState> refreshIndicatorKey;
-  final Function(BuildContext) showFilterModalHandler;
-  final Function(BuildContext) showBillModalHandler;
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final mediaQuery = MediaQuery.of(context);
+    cubit = context.read<BillManagerCubit>();
 
-    return SliverAppBar(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(25),
-          bottomRight: Radius.circular(25),
+    return Scaffold(
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: () async {
+          await cubit.refreshBillState(
+            callback: () => _pagingController.refresh(),
+          );
+        },
+        displacement: 10,
+        edgeOffset: 60 + mediaQuery.viewPadding.top,
+        child: CustomScrollView(
+          slivers: [
+            BillManagerAppBar(
+              refreshIndicatorKey: _refreshIndicatorKey,
+              showFilterModalHandler: _showFilterModal,
+              showBillModalHandler: _showBillModal,
+            ),
+            BlocBuilder<BillManagerCubit, BillManagerState>(
+              buildWhen: (previous, current) =>
+                  previous.lastBuildTimestamp != current.lastBuildTimestamp,
+              builder: (context, cubitState) {
+                final blocState = cubit.billBloc.state;
+                List<int> sequence = blocState.orderedSequence!;
+                if (cubitState.filtersEnabled) {
+                  sequence = sequence.where((element) {
+                    final bill = blocState.objectMap![element.toString()]!;
+                    if (cubitState.statusFilter != '' &&
+                        cubitState.statusFilter != bill.status) {
+                      return false;
+                    } else if (cubitState.typeFilter.isNotEmpty &&
+                        !cubitState.typeFilter.contains(bill.type)) {
+                      return false;
+                    } else {
+                      return true;
+                    }
+                  }).toList();
+                  if (cubitState.orderingFilter ==
+                      FetchAPIOrdering.lastUpdatedAtAsc) {
+                    sequence = sequence.reversed.toList();
+                  }
+                }
+                return sequence.isNotEmpty
+                    ? PagedSliverList(
+                        pagingController: _pagingController,
+                        builderDelegate: PagedChildBuilderDelegate<Bill>(
+                          noItemsFoundIndicatorBuilder: (context) =>
+                              const NoBillFound(),
+                          noMoreItemsIndicatorBuilder: (_) => const EndOfList(),
+                          itemBuilder: (context, bill, index) {
+                            return BillCard(
+                              key: ValueKey(bill.id),
+                              bill: bill,
+                              showModalHandler: _showBillModal,
+                            );
+                          },
+                        ),
+                      )
+                    : const NoBillFound();
+              },
+            ),
+          ],
         ),
       ),
-      floating: true,
-      pinned: true,
-      snap: true,
-      stretch: true,
-      elevation: 1,
-      bottom: PreferredSize(
-        preferredSize: const Size(double.infinity, 60),
-        child: Container(
-          width: double.infinity,
-          height: 60,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 8,
-          ),
-          child: Row(
-            children: [
-              OutlinedButton.icon(
-                onPressed: () => showFilterModalHandler(context),
-                icon: const Icon(Icons.filter_alt, size: 16),
-                label: const Text('Filter'),
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  side: BorderSide(
-                    color: colorScheme.primary,
-                    width: 1.2,
-                  ),
-                ),
-              ),
-              const Spacer(),
-              ElevatedButton.icon(
-                onPressed: () => showBillModalHandler(context),
-                icon: const Icon(Icons.add, size: 16),
-                label: const Text('Add Bill'),
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      title: const Text(
-        'Bill Manager',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      actions: [
-        IconButton(
-          onPressed: () => refreshIndicatorKey.currentState!.show(),
-          icon: const Icon(Icons.refresh),
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.search),
-        ),
-      ],
     );
   }
 }
