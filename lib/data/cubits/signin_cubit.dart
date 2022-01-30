@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/constants.dart';
 import 'package:blitter_flutter_app/data/exceptions.dart';
 import 'package:blitter_flutter_app/data/types.dart';
@@ -141,7 +142,7 @@ class SigninCubit extends Cubit<SigninState> {
     final response = await apiRepository.fetchBills(
       requestType: FetchAPIRequestType.initial,
       ordering: FetchAPIOrdering.lastUpdatedAtDesc,
-      batchSize: 30,
+      batchSize: objectBatchSize,
     );
     billBloc.add(InitializeBillState(
       json: jsonDecode(response.body),

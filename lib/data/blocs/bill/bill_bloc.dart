@@ -12,6 +12,18 @@ class BillBloc extends HydratedBloc<BillEvent, BillState> {
 
     on<RefreshBillState>((event, emit) {
       emit(state.copyWithRefreshCallJson(event.json));
+      if (event.callback != null) {
+        event.callback!();
+      }
+    });
+
+    on<AppendFetchedBills>((event, emit) {
+      emit(state.copyWith(
+        inStateCount: state.inStateCount + event.objectMapJson.length,
+        objectMap: state.objectMap!
+          ..addAll(state.generateObjectMapFromAPIJson(event.objectMapJson)),
+        lastModified: getCurrentDateTimeString(),
+      ));
     });
 
     on<AddBill>((event, emit) {

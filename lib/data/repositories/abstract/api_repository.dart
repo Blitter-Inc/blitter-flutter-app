@@ -16,6 +16,8 @@ abstract class IAPIRepository {
     String? lastRefreshed,
   });
 
+  Future<http.Response> fetchRequestedBills(JsonMap payload);
+
   Future<http.Response> createBill(JsonMap payload);
 
   Future<http.Response> updateBill(int id, JsonMap payload);

@@ -8,17 +8,13 @@ class NoBillFound extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    return SliverFillRemaining(
-      hasScrollBody: false,
-      child: Center(
-        child: Text(
-          'No Bills Found',
-          style: TextStyle(
-            color: colorScheme.primary,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
+    return Center(
+      child: Text(
+        'No Bills Found',
+        style: TextStyle(
+          color: colorScheme.primary,
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
