@@ -1,13 +1,15 @@
 import 'dart:io' show Platform;
 import 'dart:convert';
-import 'package:blitter_flutter_app/data/types.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'package:blitter_flutter_app/data/constants.dart';
 import 'package:blitter_flutter_app/data/exceptions.dart';
+import 'package:blitter_flutter_app/data/types.dart';
 import './signin_state.dart';
 import '../blocs/blocs.dart';
 import '../repositories/repositories.dart';
@@ -136,13 +138,14 @@ class SigninCubit extends Cubit<SigninState> {
   }
 
   Future<void> _syncBills() async {
-    final response = await apiRepository.fetchBills();
-    final event = InitializeBillState(
-      apiSerializerRepository.fetchBillsResponseSerializer(
-        jsonDecode(response.body),
-      ),
+    final response = await apiRepository.fetchBills(
+      requestType: FetchAPIRequestType.initial,
+      ordering: FetchAPIOrdering.lastUpdatedAtDesc,
+      batchSize: 30,
     );
-    billBloc.add(event);
+    billBloc.add(InitializeBillState(
+      json: jsonDecode(response.body),
+    ));
   }
 
   Future<void> _updateProfile() async {

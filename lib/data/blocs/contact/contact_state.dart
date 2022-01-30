@@ -1,4 +1,5 @@
 import 'package:blitter_flutter_app/data/models/models.dart';
+import 'package:blitter_flutter_app/utils/date_time.dart';
 
 class ContactState {
   int totalCount;
@@ -13,7 +14,7 @@ class ContactState {
 
   ContactState.fromFetchedData({
     required this.objectMap,
-  })  : lastRefreshed = DateTime.now().toString(),
+  })  : lastRefreshed = getCurrentDateTimeString(),
         totalCount = objectMap!.length;
 
   ContactState.fromCache({

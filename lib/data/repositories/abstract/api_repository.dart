@@ -9,7 +9,12 @@ abstract class IAPIRepository {
 
   Future<http.Response> fetchUserProfiles(JsonMap payload);
 
-  Future<http.Response> fetchBills();
+  Future<http.Response> fetchBills({
+    required String requestType,
+    required String ordering,
+    int? batchSize,
+    String? lastRefreshed,
+  });
 
   Future<http.Response> createBill(JsonMap payload);
 
