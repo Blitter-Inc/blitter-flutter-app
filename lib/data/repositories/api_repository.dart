@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:blitter_flutter_app/data/constants.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:blitter_flutter_app/config.dart' show apiBaseUrl;
@@ -27,7 +28,7 @@ class ApiURI {
   }
 
   static Uri fetchBills({Map<String, dynamic> params = const {}}) {
-    return _generateUri('bill-manager/bill/', params: params);
+    return _generateUri('bill-manager/bill/fetch/', params: params);
   }
 
   static Uri createBill() {
@@ -101,9 +102,25 @@ class APIRepository extends IAPIRepository {
   }
 
   @override
-  Future<http.Response> fetchBills() async {
+  Future<http.Response> fetchBills({
+    required String requestType,
+    required String ordering,
+    int? batchSize,
+    String? lastRefreshed,
+  }) async {
     var response = await http.get(
-      ApiURI.fetchBills(),
+      ApiURI.fetchBills(
+        params: {
+          'request_type': requestType,
+          'ordering': ordering,
+          ...(requestType == FetchAPIRequestType.initial)
+              ? {'batch_size': batchSize.toString()}
+              : {},
+          ...(requestType == FetchAPIRequestType.refresh)
+              ? {'last_refreshed': lastRefreshed}
+              : {},
+        },
+      ),
       headers: _getAuthHeaders(),
     );
     return response;

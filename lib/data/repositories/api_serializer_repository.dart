@@ -41,37 +41,4 @@ class APISerializerRepository {
     return body.map(
         (key, value) => MapEntry<String, User>(key, User.fromAPIJson(value)));
   }
-
-  JsonMap fetchBillsResponseSerializer(JsonMap body) {
-    return {
-      'totalCount': body['count'],
-      'currentPage': body['page'],
-      'hasNext': body['next'] != null,
-      'ordering': body['ordering'],
-      'orderedSequence': (body['ordered_sequence'] as List).cast<int>(),
-      'objectMap': (body['object_map'] as Map).map(
-          (key, value) => MapEntry<String, Bill>(key, Bill.fromAPIJson(value))),
-    };
-  }
-
-  JsonMap createBillRequestSerializer(JsonMap payload) {
-    return {
-      ...payload,
-    };
-  }
-
-  Bill createBillResponseSerializer(JsonMap body) {
-    return Bill.fromAPIJson(body);
-  }
-
-  JsonMap updateBillRequestSerializer(JsonMap payload) {
-    return {
-      ...payload,
-      'subscribers': payload['subscribers'] ?? [],
-    };
-  }
-
-  Bill updateBillResponseSerializer(JsonMap body) {
-    return Bill.fromAPIJson(body);
-  }
 }

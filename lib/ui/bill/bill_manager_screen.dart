@@ -52,24 +52,26 @@ class BillManagerScreen extends StatelessWidget {
     final cubit = context.read<BillManagerCubit>();
 
     return Scaffold(
-      body: RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: cubit.refreshBillState,
-        displacement: 10,
-        edgeOffset: 60 + mediaQuery.viewPadding.top,
-        child: CustomScrollView(
-          slivers: [
-            BillManagerAppBar(
-              refreshIndicatorKey: _refreshIndicatorKey,
-              showFilterModalHandler: _showFilterModal,
-              showBillModalHandler: _showBillModal,
+      body: BlocBuilder<BillBloc, BillState>(
+        buildWhen: (previous, current) {
+          return previous.lastModified != current.lastModified;
+        },
+        builder: (context, blocState) {
+          return RefreshIndicator(
+            key: _refreshIndicatorKey,
+            onRefresh: () async => await cubit.refreshBillState(
+              lastRefreshed: blocState.lastRefreshed!,
             ),
-            BlocBuilder<BillBloc, BillState>(
-              buildWhen: (previous, current) {
-                return previous.lastModified != current.lastModified;
-              },
-              builder: (context, blocState) {
-                return BlocBuilder<BillManagerCubit, BillManagerState>(
+            displacement: 10,
+            edgeOffset: 60 + mediaQuery.viewPadding.top,
+            child: CustomScrollView(
+              slivers: [
+                BillManagerAppBar(
+                  refreshIndicatorKey: _refreshIndicatorKey,
+                  showFilterModalHandler: _showFilterModal,
+                  showBillModalHandler: _showBillModal,
+                ),
+                BlocBuilder<BillManagerCubit, BillManagerState>(
                   buildWhen: (previous, current) =>
                       previous.lastBuildTimestamp != current.lastBuildTimestamp,
                   builder: (context, cubitState) {
@@ -109,11 +111,11 @@ class BillManagerScreen extends StatelessWidget {
                           )
                         : const NoBillFound();
                   },
-                );
-              },
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
