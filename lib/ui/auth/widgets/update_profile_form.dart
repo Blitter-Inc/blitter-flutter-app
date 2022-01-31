@@ -68,11 +68,10 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
     avatar = userState?.avatar;
 
     return Form(
-      child: Container(
-        padding: const EdgeInsets.only(top: 85),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(top: 85, bottom: 20),
         child: Column(
           children: [
-            const SizedBox(height: 25),
             Avatar(
                 getImage: _getImage,
                 pickImage: _pickImage,

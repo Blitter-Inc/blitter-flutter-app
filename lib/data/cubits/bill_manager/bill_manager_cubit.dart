@@ -6,6 +6,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/constants.dart';
+import 'package:blitter_flutter_app/data/models.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
 import './bill_manager_state.dart';
 
@@ -19,6 +20,94 @@ class BillManagerCubit extends Cubit<BillManagerState> {
   final APIRepository apiRepository;
   final APISerializerRepository apiSerializerRepository;
   final BillBloc billBloc;
+
+  Future<void> _syncBillsToState({
+    required Map<String, dynamic> objectMapJson,
+  }) async {
+    if (objectMapJson.isEmpty) return;
+    billBloc.add(AppendFetchedBills(
+      objectMapJson: objectMapJson,
+    ));
+    await billBloc.stream.firstWhere(
+        (element) => element.objectMap!.containsKey(objectMapJson.keys.first));
+  }
+
+  Future<void> _fetchAndSyncRequiredBillsToBillState({
+    required List<int> sequence,
+  }) async {
+    final objectMap = billBloc.state.objectMap!;
+    final List<int> billsToBeFetched = [];
+
+    for (final id in sequence) {
+      if (!objectMap.containsKey(id.toString())) {
+        billsToBeFetched.add(id);
+      }
+    }
+
+    if (billsToBeFetched.isNotEmpty) {
+      final response = await apiRepository.fetchRequestedBills({
+        'ids': billsToBeFetched,
+      });
+      final Map<String, dynamic> objectMapJson = jsonDecode(response.body);
+      await _syncBillsToState(objectMapJson: objectMapJson);
+    }
+  }
+
+  Future<void> _fetchAndSyncFilteredBillsToState() async {
+    final response = await apiRepository.fetchBills(
+      requestType: FetchAPIRequestType.initial,
+      ordering: state.orderingFilter,
+      batchSize: objectBatchSize,
+      params: state.filters,
+    );
+    final apiRes = jsonDecode(response.body);
+    emit(
+      state.copyWith(
+        filteredSequence:
+            (apiRes['ordered_sequence']! as List<dynamic>).cast<int>(),
+      ),
+    );
+    await _syncBillsToState(objectMapJson: apiRes['object_map']!);
+  }
+
+  List<Bill> _generateBillListFromSequence({required List<int> sequence}) {
+    return sequence.map((e) => billBloc.state.getBillById(e)!).toList();
+  }
+
+  List<int> _generateCurrentPageSequence({
+    required int pageKey,
+    required List<int> sequence,
+  }) {
+    return sequence.sublist(
+        pageKey, min(pageKey + objectBatchSize, sequence.length));
+  }
+
+  Future<List<Bill>> _generateCurrentPageBillList({
+    required int pageKey,
+    required List<int> sequence,
+  }) async {
+    final currentPageBillIdSequence = _generateCurrentPageSequence(
+      pageKey: pageKey,
+      sequence: sequence,
+    );
+    await _fetchAndSyncRequiredBillsToBillState(
+        sequence: currentPageBillIdSequence);
+    return _generateBillListFromSequence(sequence: currentPageBillIdSequence);
+  }
+
+  void _appendPage({
+    required List<Bill> sequence,
+    required PagingController controller,
+    required int pageKey,
+  }) {
+    final nextPageKey = pageKey + objectBatchSize;
+    final isLastPage = sequence.length < objectBatchSize;
+    if (isLastPage) {
+      controller.appendLastPage(sequence);
+    } else {
+      controller.appendPage(sequence, nextPageKey);
+    }
+  }
 
   void setOrderingFilter(String ordering) {
     emit(state.copyWith(
@@ -73,38 +162,23 @@ class BillManagerCubit extends Cubit<BillManagerState> {
     required int pageKey,
     required PagingController controller,
   }) async {
-    final nextPageKey = pageKey + objectBatchSize;
-
-    final state = billBloc.state;
-    final currentPageBillIds = state.orderedSequence!
-        .sublist(pageKey, min(nextPageKey, state.totalCount));
-    final List<int> billsToBeFetched = [];
-
-    for (final id in currentPageBillIds) {
-      if (!state.objectMap!.containsKey(id.toString())) {
-        billsToBeFetched.add(id);
+    late List<int> sequence;
+    if (state.filtersEnabled) {
+      if (pageKey == 0) {
+        await _fetchAndSyncFilteredBillsToState();
       }
-    }
-
-    if (billsToBeFetched.isNotEmpty) {
-      final response =
-          await apiRepository.fetchRequestedBills({'ids': billsToBeFetched});
-      final Map<String, dynamic> objectMapJson = jsonDecode(response.body);
-      billBloc.add(AppendFetchedBills(
-        objectMapJson: objectMapJson,
-      ));
-      await billBloc.stream.firstWhere((element) =>
-          element.objectMap!.containsKey(objectMapJson.keys.first));
-    }
-
-    final currentPageBills =
-        currentPageBillIds.map((e) => state.getBillById(e)!).toList();
-    final isLastPage = currentPageBillIds.length < objectBatchSize;
-
-    if (isLastPage) {
-      controller.appendLastPage(currentPageBills);
+      sequence = state.filteredSequence;
     } else {
-      controller.appendPage(currentPageBills, nextPageKey);
+      sequence = billBloc.state.orderedSequence!;
     }
+    final currentPageBillList = await _generateCurrentPageBillList(
+      pageKey: pageKey,
+      sequence: sequence,
+    );
+    _appendPage(
+      sequence: currentPageBillList,
+      controller: controller,
+      pageKey: pageKey,
+    );
   }
 }

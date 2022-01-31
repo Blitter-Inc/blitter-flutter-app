@@ -111,7 +111,9 @@ class APIRepository extends IAPIRepository {
     required String ordering,
     int? batchSize,
     String? lastRefreshed,
+    Map<String, dynamic>? params,
   }) async {
+    params ??= <String, dynamic>{};
     var response = await http.get(
       ApiURI.fetchBills(
         params: {
@@ -123,6 +125,7 @@ class APIRepository extends IAPIRepository {
           ...(requestType == FetchAPIRequestType.refresh)
               ? {'last_refreshed': lastRefreshed}
               : {},
+          ...params,
         },
       ),
       headers: _getAuthHeaders(),
