@@ -9,7 +9,10 @@ import './filter_modal_tile.dart';
 class BillFilterModal extends StatelessWidget {
   const BillFilterModal({
     Key? key,
+    required this.refreshList,
   }) : super(key: key);
+
+  final VoidCallback refreshList;
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +147,7 @@ class BillFilterModal extends StatelessWidget {
                               child: const Text('Clear'),
                               onPressed: () {
                                 cubit.clearFilters();
+                                refreshList();
                                 Navigator.of(context).pop();
                               },
                               style: OutlinedButton.styleFrom(
@@ -163,6 +167,7 @@ class BillFilterModal extends StatelessWidget {
                               child: const Text('Apply'),
                               onPressed: () async {
                                 cubit.enableFilters();
+                                refreshList();
                                 Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(

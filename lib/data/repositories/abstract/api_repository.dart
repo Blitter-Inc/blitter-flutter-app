@@ -14,6 +14,7 @@ abstract class IAPIRepository {
     required String ordering,
     int? batchSize,
     String? lastRefreshed,
+    Map<String, dynamic>? params,
   });
 
   Future<http.Response> fetchRequestedBills(JsonMap payload);

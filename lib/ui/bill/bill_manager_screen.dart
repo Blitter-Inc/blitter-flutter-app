@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
-import 'package:blitter_flutter_app/data/constants.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/models.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
@@ -45,7 +44,9 @@ class _BillManagerScreenState extends State<BillManagerScreen> {
       builder: (_) => BlocProvider.value(
         value: context.read<BillManagerCubit>(),
         child: Dialog(
-          child: const BillFilterModal(),
+          child: BillFilterModal(
+            refreshList: _refreshList,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -54,6 +55,10 @@ class _BillManagerScreenState extends State<BillManagerScreen> {
       ),
       barrierColor: Colors.black87,
     );
+  }
+
+  void _refreshList() {
+    _pagingController.refresh();
   }
 
   @override
@@ -93,52 +98,24 @@ class _BillManagerScreenState extends State<BillManagerScreen> {
         child: CustomScrollView(
           slivers: [
             BillManagerAppBar(
-              refreshIndicatorKey: _refreshIndicatorKey,
               showFilterModalHandler: _showFilterModal,
               showBillModalHandler: _showBillModal,
+              refreshIndicatorKey: _refreshIndicatorKey,
+              refreshListHandler: _refreshList,
             ),
-            BlocBuilder<BillManagerCubit, BillManagerState>(
-              buildWhen: (previous, current) =>
-                  previous.lastBuildTimestamp != current.lastBuildTimestamp,
-              builder: (context, cubitState) {
-                final blocState = cubit.billBloc.state;
-                List<int> sequence = blocState.orderedSequence!;
-                if (cubitState.filtersEnabled) {
-                  sequence = sequence.where((element) {
-                    final bill = blocState.objectMap![element.toString()]!;
-                    if (cubitState.statusFilter != '' &&
-                        cubitState.statusFilter != bill.status) {
-                      return false;
-                    } else if (cubitState.typeFilter.isNotEmpty &&
-                        !cubitState.typeFilter.contains(bill.type)) {
-                      return false;
-                    } else {
-                      return true;
-                    }
-                  }).toList();
-                  if (cubitState.orderingFilter ==
-                      FetchAPIOrdering.lastUpdatedAtAsc) {
-                    sequence = sequence.reversed.toList();
-                  }
-                }
-                return sequence.isNotEmpty
-                    ? PagedSliverList(
-                        pagingController: _pagingController,
-                        builderDelegate: PagedChildBuilderDelegate<Bill>(
-                          noItemsFoundIndicatorBuilder: (context) =>
-                              const NoBillFound(),
-                          noMoreItemsIndicatorBuilder: (_) => const EndOfList(),
-                          itemBuilder: (context, bill, index) {
-                            return BillCard(
-                              key: ValueKey(bill.id),
-                              bill: bill,
-                              showModalHandler: _showBillModal,
-                            );
-                          },
-                        ),
-                      )
-                    : const NoBillFound();
-              },
+            PagedSliverList(
+              pagingController: _pagingController,
+              builderDelegate: PagedChildBuilderDelegate<Bill>(
+                noItemsFoundIndicatorBuilder: (context) => const NoBillFound(),
+                noMoreItemsIndicatorBuilder: (_) => const EndOfList(),
+                itemBuilder: (context, bill, index) {
+                  return BillCard(
+                    key: ValueKey(bill.id),
+                    bill: bill,
+                    showModalHandler: _showBillModal,
+                  );
+                },
+              ),
             ),
           ],
         ),

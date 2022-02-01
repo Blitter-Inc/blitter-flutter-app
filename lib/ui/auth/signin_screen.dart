@@ -226,7 +226,6 @@ class _SigninScreenState extends State<SigninScreen>
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 25),
-              alignment: Alignment.center,
               child: child,
             ),
           ],

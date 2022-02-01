@@ -35,7 +35,7 @@ class BillCardSubscribers extends StatelessWidget {
                   i,
                   Positioned(
                     right:
-                        bill.subscribers.length > 1 ? (i * 20) + 7 : (i * 20),
+                        bill.subscribers.length > 1 ? (i * 25) + 7 : (i * 25),
                     child: Padding(
                       padding: const EdgeInsets.only(top: 5),
                       child: CircleAvatar(

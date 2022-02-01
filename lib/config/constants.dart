@@ -1,2 +1,2 @@
 const apiBaseUrl = 'blitter-api.herokuapp.com';
-const objectBatchSize = 30;
+const objectBatchSize = 25;
