@@ -142,6 +142,28 @@ class BillManagerCubit extends Cubit<BillManagerState> {
   }
 
   void clearFilters() {
+    final initialState = BillManagerState.init();
+    if (state.searchFilter.isEmpty) {
+      // Clear all filters
+      emit(initialState);
+    } else {
+      // Clear filters for search results
+      emit(initialState.copyWith(
+        filtersEnabled: true,
+        filters: initialState.filters
+          ..update('search', (_) => state.searchFilter),
+      ));
+    }
+  }
+
+  void enableSearchFilter(String search) {
+    emit(state.copyWith(
+      filtersEnabled: true,
+      filters: state.filters..update('search', (_) => search),
+    ));
+  }
+
+  void disableSearchFilter() {
     emit(BillManagerState.init());
   }
 

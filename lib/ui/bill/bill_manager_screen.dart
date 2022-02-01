@@ -98,9 +98,10 @@ class _BillManagerScreenState extends State<BillManagerScreen> {
         child: CustomScrollView(
           slivers: [
             BillManagerAppBar(
-              refreshIndicatorKey: _refreshIndicatorKey,
               showFilterModalHandler: _showFilterModal,
               showBillModalHandler: _showBillModal,
+              refreshIndicatorKey: _refreshIndicatorKey,
+              refreshListHandler: _refreshList,
             ),
             PagedSliverList(
               pagingController: _pagingController,

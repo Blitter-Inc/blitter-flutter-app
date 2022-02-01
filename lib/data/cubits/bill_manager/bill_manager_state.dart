@@ -18,6 +18,7 @@ class BillManagerState {
         filtersEnabled = false,
         filters = {
           'ordering': FetchAPIOrdering.lastUpdatedAtDesc,
+          'search': '',
           'status': '',
           'type': <String>{},
         },
@@ -37,6 +38,7 @@ class BillManagerState {
       );
 
   String get orderingFilter => filters['ordering'];
+  String get searchFilter => filters['search'];
   String get statusFilter => filters['status'];
   Set<String> get typeFilter => filters['type'];
 }
