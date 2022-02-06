@@ -62,7 +62,7 @@ class BillFilterModal extends StatelessWidget {
                                   onSelected: (_) {
                                     cubit.setOrderingFilter(e);
                                   },
-                                  labelStyle: themeData.chipTheme.labelStyle
+                                  labelStyle: themeData.chipTheme.labelStyle!
                                       .copyWith(
                                           color: !selected
                                               ? themeData
@@ -91,7 +91,7 @@ class BillFilterModal extends StatelessWidget {
                                     cubit.removeTypeFilter(e);
                                   }
                                 },
-                                labelStyle: themeData.chipTheme.labelStyle
+                                labelStyle: themeData.chipTheme.labelStyle!
                                     .copyWith(
                                         color: !selected
                                             ? themeData
@@ -119,7 +119,7 @@ class BillFilterModal extends StatelessWidget {
                                     cubit.clearStatusFilter();
                                   }
                                 },
-                                labelStyle: themeData.chipTheme.labelStyle
+                                labelStyle: themeData.chipTheme.labelStyle!
                                     .copyWith(
                                         color: !selected
                                             ? themeData
