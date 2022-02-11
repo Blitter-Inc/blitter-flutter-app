@@ -19,8 +19,7 @@ class BillNameInput extends StatelessWidget {
       enabled: enabled,
       textCapitalization: TextCapitalization.sentences,
       decoration: const InputDecoration(
-        labelText: 'Enter bill name',
-        floatingLabelBehavior: FloatingLabelBehavior.never,
+        hintText: 'Enter bill name',
         border: InputBorder.none,
       ),
       style: TextStyle(

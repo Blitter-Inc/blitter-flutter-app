@@ -94,8 +94,8 @@ class _BillEditModalState extends State<BillEditModal>
           Container(
             margin: const EdgeInsets.only(bottom: 100),
             child: SingleChildScrollView(
-              padding: EdgeInsets.only(
-                top: widget.bill == null ? 23 : 8,
+              padding: const EdgeInsets.only(
+                top: 40,
                 left: 10,
                 right: 10,
                 bottom: 20,
@@ -146,26 +146,33 @@ class _BillEditModalState extends State<BillEditModal>
           ),
           Positioned(
             top: 0,
-            left: 0,
-            child: TextButton(
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
-                    Icon(Icons.arrow_back_ios, size: 12.5),
-                    Text('Cancel',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                  ],
-                ),
+            child: Container(
+              width: mediaQuery.size.width,
+              color: colorScheme.modalBackground,
+              child: Row(
+                children: [
+                  TextButton(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: const [
+                          Icon(Icons.arrow_back_ios, size: 12.5),
+                          Text('Cancel',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    onPressed: () {
+                      if (widget.bill == null) {
+                        Navigator.of(context).pop();
+                      } else {
+                        widget.toggleEdit();
+                      }
+                    },
+                  ),
+                ],
               ),
-              onPressed: () {
-                if (widget.bill == null) {
-                  Navigator.of(context).pop();
-                } else {
-                  widget.toggleEdit();
-                }
-              },
             ),
           ),
           if (_isLoading) const LinearProgressIndicator(),
