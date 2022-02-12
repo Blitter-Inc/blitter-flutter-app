@@ -103,18 +103,24 @@ class _BillManagerScreenState extends State<BillManagerScreen> {
               refreshIndicatorKey: _refreshIndicatorKey,
               refreshListHandler: _refreshList,
             ),
-            PagedSliverList(
-              pagingController: _pagingController,
-              builderDelegate: PagedChildBuilderDelegate<Bill>(
-                noItemsFoundIndicatorBuilder: (context) => const NoBillFound(),
-                noMoreItemsIndicatorBuilder: (_) => const EndOfList(),
-                itemBuilder: (context, bill, index) {
-                  return BillCard(
-                    key: ValueKey(bill.id),
-                    bill: bill,
-                    showModalHandler: _showBillModal,
-                  );
-                },
+            BlocListener<BillBloc, BillState>(
+              listenWhen: (previous, current) =>
+                  previous.lastModified != current.lastModified,
+              listener: (_, __) => _refreshList(),
+              child: PagedSliverList(
+                pagingController: _pagingController,
+                builderDelegate: PagedChildBuilderDelegate<Bill>(
+                  noItemsFoundIndicatorBuilder: (context) =>
+                      const NoBillFound(),
+                  noMoreItemsIndicatorBuilder: (_) => const EndOfList(),
+                  itemBuilder: (context, bill, index) {
+                    return BillCard(
+                      key: ValueKey(bill.id),
+                      bill: bill,
+                      showModalHandler: _showBillModal,
+                    );
+                  },
+                ),
               ),
             ),
           ],
