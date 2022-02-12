@@ -12,28 +12,25 @@ class BillManagerAppBar extends StatefulWidget {
     required this.showBillModalHandler,
     required this.refreshIndicatorKey,
     required this.refreshListHandler,
+    required this.searchBarEnabled,
+    required this.toggleSearchBar,
   }) : super(key: key);
 
   final Function(BuildContext) showFilterModalHandler;
   final Function(BuildContext) showBillModalHandler;
   final GlobalKey<RefreshIndicatorState> refreshIndicatorKey;
   final VoidCallback refreshListHandler;
+  final bool searchBarEnabled;
+  final VoidCallback toggleSearchBar;
 
   @override
   State<BillManagerAppBar> createState() => _BillManagerAppBarState();
 }
 
 class _BillManagerAppBarState extends State<BillManagerAppBar> {
-  bool _searchBarEnabled = false;
   late BillManagerCubit cubit;
   late TextEditingController _searchController;
   late Debouncer _deboucer;
-
-  _toggleSearchBar() {
-    setState(() {
-      _searchBarEnabled = !_searchBarEnabled;
-    });
-  }
 
   void _enableSearch(String search) {
     cubit.enableSearchFilter(search);
@@ -147,20 +144,20 @@ class _BillManagerAppBarState extends State<BillManagerAppBar> {
       title: AnimatedSwitcher(
         duration: const Duration(milliseconds: 150),
         switchInCurve: Curves.easeOutQuint,
-        child: _searchBarEnabled ? searchBar : appBarTitle,
+        child: widget.searchBarEnabled ? searchBar : appBarTitle,
       ),
       actions: [
-        if (!(Platform.isAndroid || Platform.isIOS) && !_searchBarEnabled)
+        if (!(Platform.isAndroid || Platform.isIOS) && !widget.searchBarEnabled)
           IconButton(
             onPressed: () => widget.refreshIndicatorKey.currentState!.show(),
             icon: const Icon(Icons.refresh),
           ),
         IconButton(
           onPressed: () {
-            if (_searchBarEnabled) _clearSearch();
-            _toggleSearchBar();
+            if (widget.searchBarEnabled) _clearSearch();
+            widget.toggleSearchBar();
           },
-          icon: Icon(_searchBarEnabled ? Icons.clear : Icons.search),
+          icon: Icon(widget.searchBarEnabled ? Icons.clear : Icons.search),
         ),
       ],
     );

@@ -22,6 +22,15 @@ class _BillManagerScreenState extends State<BillManagerScreen> {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   late PagingController<int, Bill> _pagingController;
   late BillManagerCubit cubit;
+  bool _searchBarEnabled = false;
+
+  bool get _isSearchBarEnabled => _searchBarEnabled;
+
+  _toggleSearchBar() {
+    setState(() {
+      _searchBarEnabled = !_searchBarEnabled;
+    });
+  }
 
   void _showBillModal(BuildContext context, {String? billId}) {
     showModalBottomSheet(
@@ -87,6 +96,7 @@ class _BillManagerScreenState extends State<BillManagerScreen> {
 
     return Scaffold(
       body: RefreshIndicator(
+        notificationPredicate: (_) => !_searchBarEnabled,
         key: _refreshIndicatorKey,
         onRefresh: () async {
           await cubit.refreshBillState(
@@ -102,6 +112,8 @@ class _BillManagerScreenState extends State<BillManagerScreen> {
               showBillModalHandler: _showBillModal,
               refreshIndicatorKey: _refreshIndicatorKey,
               refreshListHandler: _refreshList,
+              searchBarEnabled: _isSearchBarEnabled,
+              toggleSearchBar: _toggleSearchBar,
             ),
             BlocListener<BillBloc, BillState>(
               listenWhen: (previous, current) =>
