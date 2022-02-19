@@ -55,24 +55,25 @@ class BlitterApp extends StatelessWidget {
             DashboardScreen.route: (_) => const DashboardScreen(),
             BillManagerScreen.route: (ctx) {
               return BlocProvider<BillManagerCubit>(
-                  create: (_) => BillManagerCubit(
-                        apiRepository: context.read<APIRepository>(),
-                        apiSerializerRepository:
-                            context.read<APISerializerRepository>(),
-                        billBloc: context.read<BillBloc>(),
+                create: (_) => BillManagerCubit(
+                  apiRepository: context.read<APIRepository>(),
+                  apiSerializerRepository:
+                      context.read<APISerializerRepository>(),
+                  billBloc: context.read<BillBloc>(),
+                ),
+                child: BlocBuilder<ConfigBloc, ConfigState>(
+                  builder: (context, state) {
+                    final themeData = Theme.of(ctx);
+                    return Theme(
+                      data: generateModuleThemeData(
+                        defaultThemeData: themeData,
+                        modulePrimaryColor: state.billPrimaryColor,
                       ),
-                  child: BlocBuilder<ConfigBloc, ConfigState>(
-                    builder: (context, state) {
-                      final themeData = Theme.of(ctx);
-                      return Theme(
-                        data: generateModuleThemeData(
-                          defaultThemeData: themeData,
-                          modulePrimaryColor: state.billPrimaryColor,
-                        ),
-                        child: const BillManagerScreen(),
-                      );
-                    },
-                  ));
+                      child: const BillManagerScreen(),
+                    );
+                  },
+                ),
+              );
             },
           },
           debugShowCheckedModeBanner: false,

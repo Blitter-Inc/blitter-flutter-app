@@ -24,24 +24,15 @@ class BillManagerAppBar extends StatefulWidget {
 }
 
 class _BillManagerAppBarState extends State<BillManagerAppBar> {
-  bool _searchBarEnabled = false;
   late BillManagerCubit cubit;
-  late TextEditingController _searchController;
   late Debouncer _deboucer;
 
-  _toggleSearchBar() {
-    setState(() {
-      _searchBarEnabled = !_searchBarEnabled;
-    });
-  }
-
-  void _enableSearch(String search) {
-    cubit.enableSearchFilter(search);
+  void _enableSearch() {
+    cubit.enableSearchFilter();
     widget.refreshListHandler();
   }
 
   void _clearSearch() {
-    _searchController.clear();
     cubit.disableSearchFilter();
     widget.refreshListHandler();
   }
@@ -49,7 +40,6 @@ class _BillManagerAppBarState extends State<BillManagerAppBar> {
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
     _deboucer = Debouncer(
       duration: const Duration(milliseconds: 600),
     );
@@ -72,11 +62,12 @@ class _BillManagerAppBarState extends State<BillManagerAppBar> {
     );
 
     final searchBar = TextField(
-      controller: _searchController,
+      autofocus: true,
+      controller: cubit.state.searchController,
       onChanged: (search) => _deboucer.run(() {
-        if (_searchController.text.length > 2) {
-          _enableSearch(search);
-        } else if (_searchController.text.isEmpty) {
+        if (cubit.state.searchController.text.length > 2) {
+          _enableSearch();
+        } else if (cubit.state.searchController.text.isEmpty) {
           _clearSearch();
         }
       }),
@@ -131,38 +122,49 @@ class _BillManagerAppBarState extends State<BillManagerAppBar> {
       ),
     );
 
-    return SliverAppBar(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(25),
-          bottomRight: Radius.circular(25),
-        ),
-      ),
-      floating: true,
-      pinned: true,
-      snap: true,
-      stretch: true,
-      elevation: 1,
-      bottom: actionBar,
-      title: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 150),
-        switchInCurve: Curves.easeOutQuint,
-        child: _searchBarEnabled ? searchBar : appBarTitle,
-      ),
-      actions: [
-        if (!(Platform.isAndroid || Platform.isIOS) && !_searchBarEnabled)
-          IconButton(
-            onPressed: () => widget.refreshIndicatorKey.currentState!.show(),
-            icon: const Icon(Icons.refresh),
+    return BlocBuilder<BillManagerCubit, BillManagerState>(
+      buildWhen: (previous, current) =>
+          previous.searchBarEnabled != current.searchBarEnabled,
+      builder: (context, state) {
+        return SliverAppBar(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(25),
+              bottomRight: Radius.circular(25),
+            ),
           ),
-        IconButton(
-          onPressed: () {
-            if (_searchBarEnabled) _clearSearch();
-            _toggleSearchBar();
-          },
-          icon: Icon(_searchBarEnabled ? Icons.clear : Icons.search),
-        ),
-      ],
+          floating: true,
+          pinned: true,
+          snap: true,
+          stretch: true,
+          elevation: 1,
+          bottom: actionBar,
+          title: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 150),
+            switchInCurve: Curves.easeOutQuint,
+            child: state.searchBarEnabled ? searchBar : appBarTitle,
+          ),
+          actions: [
+            if (!(Platform.isAndroid || Platform.isIOS) &&
+                !state.searchBarEnabled)
+              IconButton(
+                onPressed: () =>
+                    widget.refreshIndicatorKey.currentState!.show(),
+                icon: const Icon(Icons.refresh),
+              ),
+            IconButton(
+              onPressed: () {
+                if (state.searchBarEnabled) {
+                  _clearSearch();
+                } else {
+                  cubit.enableSearchBar();
+                }
+              },
+              icon: Icon(state.searchBarEnabled ? Icons.clear : Icons.search),
+            ),
+          ],
+        );
+      },
     );
   }
 }

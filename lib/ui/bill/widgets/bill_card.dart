@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:marquee/marquee.dart';
+import 'package:intl/intl.dart' as intl;
 
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/models.dart' show Bill;
@@ -17,15 +18,44 @@ class BillCard extends StatelessWidget {
     required this.showModalHandler,
   }) : super(key: key);
 
+  double _getTextWidth({
+    required MediaQueryData mediaQuery,
+    required TextStyle style,
+  }) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: '# ${bill.name}',
+        style: style,
+      ),
+      textScaleFactor: mediaQuery.textScaleFactor,
+      textDirection: TextDirection.ltr,
+    )..layout();
+    return painter.size.width;
+  }
+
   @override
   Widget build(BuildContext context) {
     final contactBloc = context.read<ContactBloc>();
     final colorScheme = Theme.of(context).colorScheme;
+    final mediaQuery = MediaQuery.of(context);
     final subtextStyle = TextStyle(
       color: colorScheme.cardSubtext,
       fontSize: 11.5,
     );
     final isFulfilled = bill.status == "fulfilled";
+
+    final billNameStyle = TextStyle(
+      color: colorScheme.cardText,
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+    );
+
+    final billNameWidth = _getTextWidth(
+      mediaQuery: mediaQuery,
+      style: billNameStyle,
+    );
+
+    final cardWidth = mediaQuery.size.width - 44;
 
     return Container(
       height: 110,
@@ -52,20 +82,25 @@ class BillCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
-                          width: 150,
+                          width: cardWidth / 2,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                '# ${bill.name}',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: TextStyle(
-                                  color: colorScheme.cardText,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                              if (billNameWidth > (cardWidth / 2))
+                                SizedBox(
+                                  height: 20,
+                                  child: Marquee(
+                                    text: '# ${bill.name}',
+                                    style: billNameStyle,
+                                    blankSpace: 30,
+                                    velocity: 40,
+                                  ),
+                                )
+                              else
+                                Text(
+                                  '# ${bill.name}',
+                                  style: billNameStyle,
                                 ),
-                              ),
                               const SizedBox(
                                 height: 1,
                               ),
@@ -139,8 +174,8 @@ extension on BuildContext {
     final midnight = DateTime(currentDateTime.year, currentDateTime.month,
         currentDateTime.day, 0, 0, 0);
     if (dateTime.isAfter(midnight)) {
-      return DateFormat.Hm().format(dateTime);
+      return intl.DateFormat.Hm().format(dateTime);
     }
-    return DateFormat('MMM d,').add_Hm().format(dateTime);
+    return intl.DateFormat('MMM d,').add_Hm().format(dateTime);
   }
 }

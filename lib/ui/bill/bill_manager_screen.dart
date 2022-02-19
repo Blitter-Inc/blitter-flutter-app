@@ -85,41 +85,65 @@ class _BillManagerScreenState extends State<BillManagerScreen> {
     final mediaQuery = MediaQuery.of(context);
     cubit = context.read<BillManagerCubit>();
 
-    return Scaffold(
-      body: RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: () async {
-          await cubit.refreshBillState(
-            callback: () => _pagingController.refresh(),
-          );
-        },
-        displacement: 10,
-        edgeOffset: 60 + mediaQuery.viewPadding.top,
-        child: CustomScrollView(
-          slivers: [
-            BillManagerAppBar(
-              showFilterModalHandler: _showFilterModal,
-              showBillModalHandler: _showBillModal,
-              refreshIndicatorKey: _refreshIndicatorKey,
-              refreshListHandler: _refreshList,
-            ),
-            PagedSliverList(
-              pagingController: _pagingController,
-              builderDelegate: PagedChildBuilderDelegate<Bill>(
-                noItemsFoundIndicatorBuilder: (context) => const NoBillFound(),
-                noMoreItemsIndicatorBuilder: (_) => const EndOfList(),
-                itemBuilder: (context, bill, index) {
-                  return BillCard(
-                    key: ValueKey(bill.id),
-                    bill: bill,
-                    showModalHandler: _showBillModal,
-                  );
-                },
+    return BlocBuilder<BillManagerCubit, BillManagerState>(
+      buildWhen: (previous, current) =>
+          previous.searchBarEnabled != current.searchBarEnabled,
+      builder: (context, state) {
+        return WillPopScope(
+          onWillPop: () async {
+            if (state.searchBarEnabled) {
+              cubit.disableSearchFilter();
+              _refreshList();
+              return false;
+            } else {
+              return true;
+            }
+          },
+          child: Scaffold(
+            body: RefreshIndicator(
+              notificationPredicate: (_) => !state.searchBarEnabled,
+              key: _refreshIndicatorKey,
+              onRefresh: () async {
+                await cubit.refreshBillState(
+                  callback: () => _pagingController.refresh(),
+                );
+              },
+              displacement: 10,
+              edgeOffset: 60 + mediaQuery.viewPadding.top,
+              child: CustomScrollView(
+                slivers: [
+                  BillManagerAppBar(
+                    showFilterModalHandler: _showFilterModal,
+                    showBillModalHandler: _showBillModal,
+                    refreshIndicatorKey: _refreshIndicatorKey,
+                    refreshListHandler: _refreshList,
+                  ),
+                  BlocListener<BillBloc, BillState>(
+                    listenWhen: (previous, current) =>
+                        previous.lastModified != current.lastModified,
+                    listener: (_, __) => _refreshList(),
+                    child: PagedSliverList(
+                      pagingController: _pagingController,
+                      builderDelegate: PagedChildBuilderDelegate<Bill>(
+                        noItemsFoundIndicatorBuilder: (context) =>
+                            const NoBillFound(),
+                        noMoreItemsIndicatorBuilder: (_) => const EndOfList(),
+                        itemBuilder: (context, bill, index) {
+                          return BillCard(
+                            key: ValueKey(bill.id),
+                            bill: bill,
+                            showModalHandler: _showBillModal,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

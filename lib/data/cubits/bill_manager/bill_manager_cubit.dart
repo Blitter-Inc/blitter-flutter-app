@@ -142,29 +142,41 @@ class BillManagerCubit extends Cubit<BillManagerState> {
   }
 
   void clearFilters() {
-    final initialState = BillManagerState.init();
-    if (state.searchFilter.isEmpty) {
-      // Clear all filters
-      emit(initialState);
-    } else {
+    final initialState = BillManagerState.init(
+      searchController: state.searchController,
+    );
+    if (state.searchBarEnabled) {
       // Clear filters for search results
       emit(initialState.copyWith(
         filtersEnabled: true,
+        searchBarEnabled: true,
         filters: initialState.filters
           ..update('search', (_) => state.searchFilter),
       ));
+    } else {
+      // Clear all filters
+      emit(initialState);
     }
   }
 
-  void enableSearchFilter(String search) {
+  void enableSearchBar() {
+    emit(state.copyWith(
+      searchBarEnabled: !state.searchBarEnabled,
+    ));
+  }
+
+  void enableSearchFilter() {
     emit(state.copyWith(
       filtersEnabled: true,
-      filters: state.filters..update('search', (_) => search),
+      filters: state.filters
+        ..update('search', (_) => state.searchController.text),
     ));
   }
 
   void disableSearchFilter() {
-    emit(BillManagerState.init());
+    emit(BillManagerState.init(
+      searchController: state.searchController..clear(),
+    ));
   }
 
   Future<void> refreshBillState({Function? callback}) async {
@@ -202,5 +214,11 @@ class BillManagerCubit extends Cubit<BillManagerState> {
       controller: controller,
       pageKey: pageKey,
     );
+  }
+
+  @override
+  Future<void> close() {
+    state.searchController.dispose();
+    return super.close();
   }
 }
