@@ -7,12 +7,7 @@ import 'package:blitter_flutter_app/utils/extensions.dart';
 import './filter_modal_tile.dart';
 
 class BillFilterModal extends StatelessWidget {
-  const BillFilterModal({
-    Key? key,
-    required this.refreshList,
-  }) : super(key: key);
-
-  final VoidCallback refreshList;
+  const BillFilterModal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +142,7 @@ class BillFilterModal extends StatelessWidget {
                               child: const Text('Clear'),
                               onPressed: () {
                                 cubit.clearFilters();
-                                refreshList();
+                                cubit.refreshPage();
                                 Navigator.of(context).pop();
                               },
                               style: OutlinedButton.styleFrom(
@@ -167,7 +162,7 @@ class BillFilterModal extends StatelessWidget {
                               child: const Text('Apply'),
                               onPressed: () async {
                                 cubit.enableFilters();
-                                refreshList();
+                                cubit.refreshPage();
                                 Navigator.of(context).pop();
                               },
                               style: ElevatedButton.styleFrom(

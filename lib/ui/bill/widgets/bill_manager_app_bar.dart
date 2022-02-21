@@ -11,13 +11,11 @@ class BillManagerAppBar extends StatefulWidget {
     required this.showFilterModalHandler,
     required this.showBillModalHandler,
     required this.refreshIndicatorKey,
-    required this.refreshListHandler,
   }) : super(key: key);
 
   final Function(BuildContext) showFilterModalHandler;
   final Function(BuildContext) showBillModalHandler;
   final GlobalKey<RefreshIndicatorState> refreshIndicatorKey;
-  final VoidCallback refreshListHandler;
 
   @override
   State<BillManagerAppBar> createState() => _BillManagerAppBarState();
@@ -25,24 +23,14 @@ class BillManagerAppBar extends StatefulWidget {
 
 class _BillManagerAppBarState extends State<BillManagerAppBar> {
   late BillManagerCubit cubit;
-  late Debouncer _deboucer;
-
-  void _enableSearch() {
-    cubit.enableSearchFilter();
-    widget.refreshListHandler();
-  }
+  final Debouncer _deboucer = Debouncer(
+    duration: const Duration(milliseconds: 600),
+  );
+  String _lastSearched = "";
 
   void _clearSearch() {
     cubit.disableSearchFilter();
-    widget.refreshListHandler();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _deboucer = Debouncer(
-      duration: const Duration(milliseconds: 600),
-    );
+    _lastSearched = "";
   }
 
   @override
@@ -65,9 +53,10 @@ class _BillManagerAppBarState extends State<BillManagerAppBar> {
       autofocus: true,
       controller: cubit.state.searchController,
       onChanged: (search) => _deboucer.run(() {
-        if (cubit.state.searchController.text.length > 2) {
-          _enableSearch();
-        } else if (cubit.state.searchController.text.isEmpty) {
+        if (search.length > 2 && search != _lastSearched) {
+          cubit.enableSearchFilter();
+          _lastSearched = search;
+        } else if (search.isEmpty) {
           _clearSearch();
         }
       }),

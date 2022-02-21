@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
@@ -15,7 +14,15 @@ class BillManagerCubit extends Cubit<BillManagerState> {
     required this.apiRepository,
     required this.apiSerializerRepository,
     required this.billBloc,
-  }) : super(BillManagerState.init());
+  }) : super(BillManagerState.init()) {
+    state.pagingController.addPageRequestListener((pageKey) async {
+      try {
+        fetchPage(pageKey: pageKey);
+      } catch (error) {
+        state.pagingController.error = error;
+      }
+    });
+  }
 
   final APIRepository apiRepository;
   final APISerializerRepository apiSerializerRepository;
@@ -97,15 +104,14 @@ class BillManagerCubit extends Cubit<BillManagerState> {
 
   void _appendPage({
     required List<Bill> sequence,
-    required PagingController controller,
     required int pageKey,
   }) {
     final nextPageKey = pageKey + objectBatchSize;
     final isLastPage = sequence.length < objectBatchSize;
     if (isLastPage) {
-      controller.appendLastPage(sequence);
+      state.pagingController.appendLastPage(sequence);
     } else {
-      controller.appendPage(sequence, nextPageKey);
+      state.pagingController.appendPage(sequence, nextPageKey);
     }
   }
 
@@ -144,6 +150,7 @@ class BillManagerCubit extends Cubit<BillManagerState> {
   void clearFilters() {
     final initialState = BillManagerState.init(
       searchController: state.searchController,
+      pagingController: state.pagingController,
     );
     if (state.searchBarEnabled) {
       // Clear filters for search results
@@ -171,15 +178,22 @@ class BillManagerCubit extends Cubit<BillManagerState> {
       filters: state.filters
         ..update('search', (_) => state.searchController.text),
     ));
+    refreshPage();
   }
 
   void disableSearchFilter() {
     emit(BillManagerState.init(
       searchController: state.searchController..clear(),
+      pagingController: state.pagingController,
     ));
+    refreshPage();
   }
 
-  Future<void> refreshBillState({Function? callback}) async {
+  void refreshPage() {
+    state.pagingController.refresh();
+  }
+
+  Future<void> refreshBillState() async {
     final response = await apiRepository.fetchBills(
       requestType: FetchAPIRequestType.refresh,
       ordering: FetchAPIOrdering.lastUpdatedAtDesc,
@@ -187,14 +201,13 @@ class BillManagerCubit extends Cubit<BillManagerState> {
     );
     final event = RefreshBillState(
       json: jsonDecode(response.body),
-      callback: callback,
+      callback: refreshPage,
     );
     billBloc.add(event);
   }
 
   Future<void> fetchPage({
     required int pageKey,
-    required PagingController controller,
   }) async {
     late List<int> sequence;
     if (state.filtersEnabled) {
@@ -211,7 +224,6 @@ class BillManagerCubit extends Cubit<BillManagerState> {
     );
     _appendPage(
       sequence: currentPageBillList,
-      controller: controller,
       pageKey: pageKey,
     );
   }
@@ -219,6 +231,7 @@ class BillManagerCubit extends Cubit<BillManagerState> {
   @override
   Future<void> close() {
     state.searchController.dispose();
+    state.pagingController.dispose();
     return super.close();
   }
 }
