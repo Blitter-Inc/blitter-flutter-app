@@ -1,12 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/models.dart';
 import 'package:blitter_flutter_app/utils/extensions.dart';
-import './user_avatar_placeholder.dart';
+import './user_avatar.dart';
 
 class BillCardSubscribers extends StatelessWidget {
   const BillCardSubscribers({
@@ -29,7 +28,7 @@ class BillCardSubscribers extends StatelessWidget {
             .asMap()
             .map(
               (i, subscriber) {
-                final user = contactBloc.getUserById(subscriber.user);
+                final user = contactBloc.getUserById(subscriber.user)!;
 
                 return MapEntry(
                   i,
@@ -38,27 +37,10 @@ class BillCardSubscribers extends StatelessWidget {
                         bill.subscribers.length > 1 ? (i * 25) + 7 : (i * 25),
                     child: Padding(
                       padding: const EdgeInsets.only(top: 5),
-                      child: CircleAvatar(
-                        backgroundColor: colorScheme.primary,
-                        child: ClipOval(
-                          child: CachedNetworkImage(
-                            fadeOutDuration: const Duration(milliseconds: 250),
-                            imageUrl: user!.avatar!,
-                            fit: BoxFit.cover,
-                            height: 36,
-                            width: 36,
-                            placeholder: (context, url) =>
-                                UserAvatarPlaceholder(
-                              initialAlphabet: user.name![0],
-                              size: 15,
-                            ),
-                            errorWidget: (context, url, error) =>
-                                UserAvatarPlaceholder(
-                              initialAlphabet: user.name![0],
-                              size: 15,
-                            ),
-                          ),
-                        ),
+                      child: UserAvatar(
+                        radius: 20,
+                        url: user.avatar!,
+                        placeholderAlphabet: user.name![0],
                       ),
                     ),
                   ),

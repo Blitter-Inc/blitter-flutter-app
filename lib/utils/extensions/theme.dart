@@ -22,6 +22,9 @@ extension CustomColorScheme on ColorScheme {
       ? darkColorPalette.modalBackgroundColor
       : lightColorPalette.modalBackgroundColor;
 
+  Color get modalBackgroundSecondary =>
+      _darkThemeEnabled ? Colors.grey[850]! : Colors.black26;
+
   Color get cupertinoPickerItemText => _darkThemeEnabled
       ? darkColorPalette.cupertinoPickerItemTextColor
       : lightColorPalette.cupertinoPickerItemTextColor;

@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/models.dart';
 import './bill_edit_toggle.dart';
 import './bill_type_badge.dart';
+import './bill_view_modal_subscribers.dart';
 import './progress_bar.dart';
 
 class BillViewModal extends StatelessWidget {
@@ -24,9 +27,14 @@ class BillViewModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final authBloc = context.read<AuthBloc>();
+
     final editToggleEnabled = hasEditPermission(
       context: context,
       createdBy: bill.createdBy,
+    );
+    final loggedInUserSubscriberIndex = bill.subscribers.indexWhere(
+      (element) => element.user == authBloc.state.user!.id,
     );
 
     return Stack(
@@ -86,11 +94,11 @@ class BillViewModal extends StatelessWidget {
                   child: Text.rich(
                     TextSpan(
                         style: TextStyle(
-                          fontSize: 15.5,
+                          fontSize: 20,
                           color: colorScheme.primary,
                         ),
                         children: [
-                          const TextSpan(text: 'Settlement: '),
+                          const TextSpan(text: 'Amount: '),
                           TextSpan(
                             text: ' ₹${bill.settledAmt}',
                             style: const TextStyle(
@@ -107,6 +115,30 @@ class BillViewModal extends StatelessWidget {
                         ]),
                   ),
                 ),
+                if (bill.subscribers.length > 1) ...[
+                  const SizedBox(height: 25),
+                  BillViewModalSubscribers(
+                    bill: bill,
+                    loggedInUserSubscriberIndex: loggedInUserSubscriberIndex,
+                  ),
+                ],
+                if (loggedInUserSubscriberIndex != -1) ...[
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 45,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        shape: const StadiumBorder(),
+                      ),
+                      child: Text(bill.subscribers[loggedInUserSubscriberIndex]
+                              .fulfilled
+                          ? 'Your settlement for this bill is complete'
+                          : 'Tap to pay your remaining ₹${double.parse(bill.subscribers[loggedInUserSubscriberIndex].amount) - double.parse(bill.subscribers[loggedInUserSubscriberIndex].amountPaid)}'),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
