@@ -12,10 +12,8 @@ class UserAvatarPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return CircleAvatar(
-      backgroundColor: colorScheme.primary,
+      backgroundColor: Colors.transparent,
       child: Text(
         initialAlphabet,
         style: TextStyle(
