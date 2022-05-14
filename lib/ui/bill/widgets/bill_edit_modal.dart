@@ -11,6 +11,7 @@ import './description_input.dart';
 import './bill_action.dart';
 import './bill_name_input.dart';
 import './bill_type_picker.dart';
+import 'bill_subscriber_picker_modal.dart';
 
 class BillEditModal extends StatefulWidget {
   const BillEditModal({
@@ -61,6 +62,17 @@ class _BillEditModalState extends State<BillEditModal>
       Navigator.of(context).pop();
     }
     _toggleLoading();
+  }
+
+  void _addPeopleModalHandler() {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => BillSubscriberPickerModal(
+        getBillModalInput: () => _input,
+      ),
+      barrierColor: Colors.black87,
+      isScrollControlled: true,
+    );
   }
 
   @override
@@ -127,6 +139,16 @@ class _BillEditModalState extends State<BillEditModal>
             ),
           ),
           Positioned(
+            child: ElevatedButton(
+              child: Text('Bla BLA'),
+              onPressed: () {
+                print(_input.subscribers);
+              },
+            ),
+            top: 40,
+            right: 0,
+          ),
+          Positioned(
             bottom: 0,
             child: Container(
               height: 100,
@@ -134,7 +156,9 @@ class _BillEditModalState extends State<BillEditModal>
               width: mediaQuery.size.width,
               child: Column(
                 children: [
-                  const BillAction(),
+                  BillAction(
+                    addPeopleModalHandler: _addPeopleModalHandler,
+                  ),
                   BottomModalButton(
                     label: 'Save',
                     onPressed: () => _onSubmit(context.read<BillModalCubit>()),

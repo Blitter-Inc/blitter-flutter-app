@@ -12,7 +12,12 @@ import './user_avatar_placeholder.dart';
 import 'bottom_modal_button.dart';
 
 class BillSubscriberPickerModal extends StatefulWidget {
-  const BillSubscriberPickerModal({Key? key}) : super(key: key);
+  const BillSubscriberPickerModal({
+    Key? key,
+    required this.getBillModalInput,
+  }) : super(key: key);
+
+  final ValueGetter<BillModalInput> getBillModalInput;
 
   @override
   State<BillSubscriberPickerModal> createState() =>
@@ -22,11 +27,17 @@ class BillSubscriberPickerModal extends StatefulWidget {
 class _BillSubscriberPickerModalState extends State<BillSubscriberPickerModal> {
   @override
   Widget build(BuildContext context) {
-    final Map<int, User> selectedSubscribers = {};
     final contactBloc = context.read<ContactBloc>();
     final mediaQuery = MediaQuery.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final contactList = contactBloc.state.objectMap!.values.toList();
+
+    final billModalInput = widget.getBillModalInput();
+    final Map<int, User> selectedSubscribers = {};
+    for (final element in billModalInput.subscribers) {
+      selectedSubscribers[element.user] =
+          contactBloc.getUserById(element.user)!;
+    }
 
     void _toggleAddRemoveSubscribers(User user) {
       if (selectedSubscribers.containsKey(user.id)) {
@@ -37,10 +48,12 @@ class _BillSubscriberPickerModalState extends State<BillSubscriberPickerModal> {
     }
 
     Future<void> _onSubmit() async {
-      List<BillSubscriberInput> billSubsInput = [];
+      billModalInput.subscribers.clear();
       for (var element in selectedSubscribers.entries) {
-        billSubsInput.add(BillSubscriberInput(user: element.key, amount: '0'));
+        billModalInput.subscribers
+            .add(BillSubscriberInput(user: element.key, amount: '0'));
       }
+      Navigator.pop(context);
     }
 
     return Stack(

@@ -5,7 +5,6 @@ import 'package:blitter_flutter_app/config.dart';
 import 'package:blitter_flutter_app/data/blocs.dart';
 import './bill_edit_modal.dart';
 import './bill_view_modal.dart';
-import './bill_subscriber_picker_modal.dart';
 
 class BillModal extends StatefulWidget {
   const BillModal({
@@ -22,7 +21,6 @@ class BillModal extends StatefulWidget {
 class _BillModalState extends State<BillModal>
     with SingleTickerProviderStateMixin {
   bool _editable = false;
-  bool _addPeople = false;
   Widget? subscriberPickerModal;
 
   late AnimationController _modalOpacityController;
@@ -109,12 +107,10 @@ class _BillModalState extends State<BillModal>
                         toggleEdit: _toggleEdit,
                         hasEditPermission: _hasEditPermission,
                       )
-                    : !_addPeople
-                        ? BillEditModal(
-                            bill: bill,
-                            toggleEdit: _toggleEdit,
-                          )
-                        : const BillSubscriberPickerModal();
+                    : BillEditModal(
+                        bill: bill,
+                        toggleEdit: _toggleEdit,
+                      );
               },
             ),
           ),
