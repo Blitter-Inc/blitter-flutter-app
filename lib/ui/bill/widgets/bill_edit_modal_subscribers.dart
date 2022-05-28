@@ -1,31 +1,30 @@
 import 'dart:math';
 
+import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
-import 'package:blitter_flutter_app/data/models.dart';
 import 'package:blitter_flutter_app/utils/extensions.dart';
 import './user_avatar.dart';
 
-class BillViewModalSubscribers extends StatelessWidget {
-  const BillViewModalSubscribers({
+class BillEditModalSubscribers extends StatelessWidget {
+  const BillEditModalSubscribers({
     Key? key,
-    required this.bill,
+    required this.billModalInput,
+    // required this.loggedInUserSubscriberIndex,
   }) : super(key: key);
 
-  final Bill bill;
-
-  void _showSubscriberModal() {
-    // TODO
-  }
+  final BillModalInput billModalInput;
+  // final int loggedInUserSubscriberIndex;
 
   @override
   Widget build(BuildContext context) {
     final contactBloc = context.read<ContactBloc>();
     final colorScheme = Theme.of(context).colorScheme;
 
-    final participantCount = bill.subscribers.length;
+    final participantCount = billModalInput.subscribers.length;
     final double subscriberListHeight = min(
       50 +
           (55 * (participantCount / 2).ceil()) +
@@ -67,7 +66,7 @@ class BillViewModalSubscribers extends StatelessWidget {
           SliverGrid(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                final subscriber = bill.subscribers[index];
+                final subscriber = billModalInput.subscribers[index];
                 final user = contactBloc.getUserById(subscriber.user)!;
 
                 return Container(
@@ -75,32 +74,39 @@ class BillViewModalSubscribers extends StatelessWidget {
                     color: colorScheme.modalBackground,
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  child: InkWell(
-                    onTap: _showSubscriberModal,
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 10),
-                        UserAvatar(
-                          radius: 20,
-                          url: user.avatar,
-                          placeholderAlphabet: user.name![0],
-                        ),
-                        const Spacer(),
-                        Text(
-                          subscriber.fulfilled
-                              ? '₹ ${subscriber.amountPaid}'
-                              : '₹ ${double.parse(subscriber.amountPaid).ceil()} / ${subscriber.amount}',
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 10),
+                      UserAvatar(
+                        radius: 20,
+                        url: user.avatar,
+                        placeholderAlphabet: user.name![0],
+                      ),
+                      const Spacer(),
+                      SizedBox(
+                        width: 100,
+                        child: TextFormField(
+                          readOnly: true,
+                          textAlign: TextAlign.right,
+                          initialValue: subscriber.amount,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'^(\d+)?\.?\d{0,2}')),
+                          ],
+                          onChanged: (value) => subscriber.setAmount(value),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
                           style: TextStyle(
-                            color: subscriber.fulfilled
-                                ? Colors.green
-                                : Colors.red.shade900,
+                            color: Colors.red.shade900,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 18),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 18),
+                    ],
                   ),
                 );
               },

@@ -4,9 +4,11 @@ class BillAction extends StatelessWidget {
   const BillAction({
     Key? key,
     required this.addPeopleModalHandler,
+    required this.equateAmountModalHandler,
   }) : super(key: key);
 
   final VoidCallback addPeopleModalHandler;
+  final VoidCallback equateAmountModalHandler;
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +19,8 @@ class BillAction extends StatelessWidget {
         children: [
           Expanded(
             child: TextButton(
-              onPressed: () {},
-              child: const Text('Add Files'),
+              onPressed: equateAmountModalHandler,
+              child: const Text('Equate Amount'),
             ),
           ),
           Expanded(

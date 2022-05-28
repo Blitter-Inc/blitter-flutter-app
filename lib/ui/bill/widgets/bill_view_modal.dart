@@ -119,11 +119,10 @@ class BillViewModal extends StatelessWidget {
                         ]),
                   ),
                 ),
-                if (bill.subscribers.length > 1) ...[
+                if (bill.subscribers.isNotEmpty) ...[
                   const SizedBox(height: 25),
                   BillViewModalSubscribers(
                     bill: bill,
-                    loggedInUserSubscriberIndex: loggedInUserSubscriberIndex,
                   ),
                 ],
                 if (loggedInUserSubscriberIndex != -1) ...[

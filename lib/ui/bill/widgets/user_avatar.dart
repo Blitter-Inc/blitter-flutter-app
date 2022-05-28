@@ -12,7 +12,7 @@ class UserAvatar extends StatelessWidget {
   }) : super(key: key);
 
   final double radius;
-  final String url;
+  final String? url;
   final String placeholderAlphabet;
 
   @override
@@ -25,7 +25,7 @@ class UserAvatar extends StatelessWidget {
       child: ClipOval(
         child: CachedNetworkImage(
           fadeOutDuration: const Duration(milliseconds: 250),
-          imageUrl: url,
+          imageUrl: url ?? '',
           fit: BoxFit.cover,
           // height: 36,
           // width: 36,

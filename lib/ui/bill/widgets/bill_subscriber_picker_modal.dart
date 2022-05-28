@@ -15,9 +15,11 @@ class BillSubscriberPickerModal extends StatefulWidget {
   const BillSubscriberPickerModal({
     Key? key,
     required this.getBillModalInput,
+    required this.calculateSubscriberAmountHandler,
   }) : super(key: key);
 
   final ValueGetter<BillModalInput> getBillModalInput;
+  final Function calculateSubscriberAmountHandler;
 
   @override
   State<BillSubscriberPickerModal> createState() =>
@@ -31,8 +33,12 @@ class _BillSubscriberPickerModalState extends State<BillSubscriberPickerModal> {
     final mediaQuery = MediaQuery.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final contactList = contactBloc.state.objectMap!.values.toList();
-
+    final authBloc = context.read<AuthBloc>();
     final billModalInput = widget.getBillModalInput();
+    final loggedInUserSubscriberIndex = billModalInput.subscribers.indexWhere(
+      (element) => element.user == authBloc.state.user!.id,
+    );
+
     final Map<int, User> selectedSubscribers = {};
     for (final element in billModalInput.subscribers) {
       selectedSubscribers[element.user] =
@@ -53,6 +59,7 @@ class _BillSubscriberPickerModalState extends State<BillSubscriberPickerModal> {
         billModalInput.subscribers
             .add(BillSubscriberInput(user: element.key, amount: '0'));
       }
+      widget.calculateSubscriberAmountHandler();
       Navigator.pop(context);
     }
 
@@ -84,14 +91,19 @@ class _BillSubscriberPickerModalState extends State<BillSubscriberPickerModal> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
+                    final contact = contactList[
+                        index == loggedInUserSubscriberIndex
+                            ? index + 1
+                            : index];
                     return SelectableItem(
-                        getBgColor: () => Colors.accents[Random().nextInt(16)],
-                        isSelected: () => selectedSubscribers
-                            .containsKey(contactList[index].id),
-                        user: contactList[index],
-                        onClick: _toggleAddRemoveSubscribers);
+                      getBgColor: () => Colors.accents[Random().nextInt(16)],
+                      isSelected: () =>
+                          selectedSubscribers.containsKey(contact.id),
+                      user: contact,
+                      onClick: _toggleAddRemoveSubscribers,
+                    );
                   },
-                  childCount: contactList.length,
+                  childCount: contactList.length - 1,
                 ),
               ),
             ],
@@ -151,7 +163,7 @@ class _SelectableItemState extends State<SelectableItem> {
                 child: ClipOval(
                   child: CachedNetworkImage(
                     fadeOutDuration: const Duration(milliseconds: 250),
-                    imageUrl: widget.user.avatar!,
+                    imageUrl: widget.user.avatar ?? '',
                     fit: BoxFit.cover,
                     height: 25,
                     width: 25,

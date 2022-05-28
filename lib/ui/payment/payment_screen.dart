@@ -1,4 +1,3 @@
-import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -14,6 +13,7 @@ class PaymentScreen extends StatelessWidget {
     BuildContext context,
     PaymentScreenArguments args,
   ) async {
+    args.billModalCubit.inProcessingTransactionmode = 'upi';
     const platform = MethodChannel("upi");
     try {
       dynamic res = await platform.invokeMethod("pay", {
@@ -37,6 +37,17 @@ class PaymentScreen extends StatelessWidget {
         ),
       );
     }
+  }
+
+  Future<void> _markAsSettled(
+    BuildContext context,
+    PaymentScreenArguments args,
+  ) async {
+    args.billModalCubit.inProcessingTransactionmode = 'cash';
+    Navigator.of(context).popAndPushNamed(
+      WaitingScreen.route,
+      arguments: args.billModalCubit,
+    );
   }
 
   @override
@@ -94,6 +105,14 @@ class PaymentScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () => _initUpiTransaction(context, args),
               child: const Text('UPI'),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => _markAsSettled(context, args),
+              child: const Text('Mark as Settled'),
             ),
           ),
         ],

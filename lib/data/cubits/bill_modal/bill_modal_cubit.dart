@@ -26,6 +26,16 @@ class BillModalCubit extends Cubit<BillModalState> {
         inTransactionBillSubscriber: subscriber,
       ));
 
+  set inProcessingTransactionmode(String? mode) {
+    emit(state.copyWith(
+      inProcessingTransactionMode: mode,
+    ));
+  }
+
+  void resetState() {
+    emit(BillModalState());
+  }
+
   Future<void> createBill({
     required BillModalInput input,
   }) async {

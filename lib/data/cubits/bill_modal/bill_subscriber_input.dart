@@ -2,13 +2,17 @@ import 'package:blitter_flutter_app/data/models.dart';
 import 'package:blitter_flutter_app/data/types.dart';
 
 class BillSubscriberInput {
-  final int user;
-  final String amount;
+  int user;
+  String amount;
 
-  const BillSubscriberInput({
+  BillSubscriberInput({
     required this.user,
     required this.amount,
   });
+
+  void setAmount(String amount) {
+    this.amount = amount;
+  }
 
   BillSubscriberInput.fromBillSubscriber(BillSubscriber subscriber)
       : user = subscriber.user,

@@ -39,7 +39,7 @@ class BillCardSubscribers extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 5),
                       child: UserAvatar(
                         radius: 20,
-                        url: user.avatar!,
+                        url: user.avatar,
                         placeholderAlphabet: user.name![0],
                       ),
                     ),

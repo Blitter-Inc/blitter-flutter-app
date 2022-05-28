@@ -11,7 +11,8 @@ import './description_input.dart';
 import './bill_action.dart';
 import './bill_name_input.dart';
 import './bill_type_picker.dart';
-import 'bill_subscriber_picker_modal.dart';
+import './bill_edit_modal_subscribers.dart';
+import './bill_subscriber_picker_modal.dart';
 
 class BillEditModal extends StatefulWidget {
   const BillEditModal({
@@ -64,11 +65,24 @@ class _BillEditModalState extends State<BillEditModal>
     _toggleLoading();
   }
 
+  void _calculateEachSubscriberAmount() {
+    setState(() {
+      if (_input.amountController.text.isNotEmpty) {
+        final amount = double.parse(_input.amountController.text);
+        final eachSubscriberAmount = amount / _input.subscribers.length;
+        for (var element in _input.subscribers) {
+          element.setAmount('$eachSubscriberAmount');
+        }
+      }
+    });
+  }
+
   void _addPeopleModalHandler() {
     showModalBottomSheet(
       context: context,
       builder: (_) => BillSubscriberPickerModal(
         getBillModalInput: () => _input,
+        calculateSubscriberAmountHandler: _calculateEachSubscriberAmount,
       ),
       barrierColor: Colors.black87,
       isScrollControlled: true,
@@ -134,19 +148,15 @@ class _BillEditModalState extends State<BillEditModal>
                     controller: _input.descriptionController,
                     enabled: true,
                   ),
+                  if (_input.subscribers.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    BillEditModalSubscribers(
+                      billModalInput: _input,
+                    ),
+                  ],
                 ],
               ),
             ),
-          ),
-          Positioned(
-            child: ElevatedButton(
-              child: Text('Bla BLA'),
-              onPressed: () {
-                print(_input.subscribers);
-              },
-            ),
-            top: 40,
-            right: 0,
           ),
           Positioned(
             bottom: 0,
@@ -157,6 +167,7 @@ class _BillEditModalState extends State<BillEditModal>
               child: Column(
                 children: [
                   BillAction(
+                    equateAmountModalHandler: _calculateEachSubscriberAmount,
                     addPeopleModalHandler: _addPeopleModalHandler,
                   ),
                   BottomModalButton(
