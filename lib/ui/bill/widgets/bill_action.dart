@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 class BillAction extends StatelessWidget {
   const BillAction({
     Key? key,
+    required this.addPeopleModalHandler,
   }) : super(key: key);
+
+  final VoidCallback addPeopleModalHandler;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +23,7 @@ class BillAction extends StatelessWidget {
           ),
           Expanded(
             child: TextButton(
-              onPressed: () {},
+              onPressed: addPeopleModalHandler,
               child: const Text('Add People'),
             ),
           ),

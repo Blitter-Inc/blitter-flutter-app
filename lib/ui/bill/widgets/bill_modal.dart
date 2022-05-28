@@ -22,6 +22,7 @@ class BillModal extends StatefulWidget {
 class _BillModalState extends State<BillModal>
     with SingleTickerProviderStateMixin {
   bool _editable = false;
+  Widget? subscriberPickerModal;
 
   late AnimationController _modalOpacityController;
   late Animation<double> _modalOpacity;
