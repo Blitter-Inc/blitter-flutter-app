@@ -23,8 +23,16 @@ class ApiURI {
     return _generateUri('/user/update-profile/');
   }
 
+  static Uri addUpi() {
+    return _generateUri('/user/upi/add/');
+  }
+
   static Uri fetchUserProfiles() {
     return _generateUri('/user/fetch-profiles/');
+  }
+
+  static Uri createTransaction() {
+    return _generateUri('user/transaction/add/');
   }
 
   static Uri fetchBills({Map<String, dynamic> params = const {}}) {
@@ -45,10 +53,6 @@ class ApiURI {
 
   static Uri updateBill(int id) {
     return _generateUri('bill-manager/bill/$id/');
-  }
-
-  static Uri createTransaction() {
-    return _generateUri('user/transaction/add/');
   }
 }
 
@@ -100,6 +104,16 @@ class APIRepository extends IAPIRepository {
       }
     });
     var response = await request.send();
+    return response;
+  }
+
+  @override
+  Future<http.Response> addUpi(JsonMap payload) async {
+    var response = await http.post(
+      ApiURI.addUpi(),
+      body: jsonEncode(payload),
+      headers: _getHeaders(),
+    );
     return response;
   }
 

@@ -67,7 +67,9 @@ class _OTPInputFormState extends State<OTPInputForm>
   void dispose() {
     _fieldController.reverse();
     _buttonController.reverse();
-
+    
+    _fieldController.dispose();
+    _buttonController.dispose();
     super.dispose();
   }
 

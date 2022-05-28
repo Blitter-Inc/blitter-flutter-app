@@ -7,6 +7,8 @@ abstract class IAPIRepository {
 
   Future<http.StreamedResponse> updateProfile(JsonMap payload);
 
+  Future<http.Response> addUpi(JsonMap payload);
+
   Future<http.Response> fetchUserProfiles(JsonMap payload);
 
   Future<http.Response> fetchBills({

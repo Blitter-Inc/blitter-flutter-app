@@ -151,6 +151,7 @@ class SigninCubit extends Cubit<SigninState> {
 
   Future<void> _updateProfile() async {
     final profileData = jsonDecode(state.profileDataJson);
+    await apiRepository.addUpi({'address': profileData['upi']});
     final apiRes = await apiRepository.updateProfile(profileData);
     final apiResBody = apiSerializerRepository.updateProfileResponseSerializer(
         jsonDecode(await apiRes.stream.bytesToString()));

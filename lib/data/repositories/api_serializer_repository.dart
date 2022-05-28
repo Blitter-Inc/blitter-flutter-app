@@ -7,6 +7,7 @@ class APISerializerRepository {
       'id': body['id'],
       'name': body['name'],
       'email': body['email'],
+      'upi': body['upi'],
       'bio': body['bio'],
       'avatar': body['avatar'],
       'phoneNumber': body['phone'],
