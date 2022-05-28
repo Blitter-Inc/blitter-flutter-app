@@ -25,11 +25,8 @@ class _BillManagerScreenState extends State<BillManagerScreen> {
   void _showBillModal(BuildContext context, {String? billId}) {
     showModalBottomSheet(
       context: context,
-      builder: (_) => BlocProvider(
-        create: (_) => BillModalCubit(
-          billBloc: context.read<BillBloc>(),
-          apiRepository: context.read<APIRepository>(),
-        ),
+      builder: (_) => BlocProvider.value(
+        value: context.read<BillModalCubit>(),
         child: BillModal(billId: billId),
       ),
       barrierColor: Colors.black87,

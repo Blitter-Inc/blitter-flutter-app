@@ -26,6 +26,7 @@ class UpdateProfileForm extends StatefulWidget {
 class _UpdateProfileFormState extends State<UpdateProfileForm> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
+  // late TextEditingController _upiController;
   late TextEditingController _bioController;
   late String? avatar;
   late File selectedAvatar;
@@ -35,6 +36,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
   void initState() {
     _nameController = TextEditingController();
     _emailController = TextEditingController();
+    // _upiController = TextEditingController();
     _bioController = TextEditingController();
     super.initState();
   }
@@ -110,6 +112,23 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
                 ),
               ),
             ),
+            // const SizedBox(height: 15),
+            // TranslucentTextFormFieldContainer(
+            //   paddingHorizontal: 5,
+            //   child: TextFormField(
+            //     controller: _upiController..text = userState?.upi ?? '',
+            //     keyboardType: TextInputType.emailAddress,
+            //     textInputAction: TextInputAction.next,
+            //     decoration: InputDecoration(
+            //       label: const Text('VPA (UPI Address for payments)'),
+            //       prefixIcon: Icon(
+            //         Icons.location_on_sharp,
+            //         color: Colors.white.withOpacity(0.5),
+            //       ),
+            //       border: InputBorder.none,
+            //     ),
+            //   ),
+            // ),
             const SizedBox(height: 20),
             TranslucentTextFormFieldContainer(
               paddingHorizontal: 5,
@@ -136,6 +155,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
                 final JsonMap payload = {
                   'name': _nameController.text,
                   'email': _emailController.text,
+                  // 'upi': _upiController.text,
                   'bio': _bioController.text,
                 };
                 if (avatarSelectorMode) {

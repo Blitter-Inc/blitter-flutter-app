@@ -1,3 +1,4 @@
+import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -71,6 +72,7 @@ class _BillModalState extends State<BillModal>
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final billModalCubit = context.read<BillModalCubit>();
 
     return AnimatedSize(
       duration: const Duration(milliseconds: 500),
@@ -100,6 +102,8 @@ class _BillModalState extends State<BillModal>
                 final bill = widget.billId == null
                     ? null
                     : state.objectMap![widget.billId];
+                billModalCubit.bill = bill;
+                
                 return !_editable
                     ? BillViewModal(
                         bill: bill!,

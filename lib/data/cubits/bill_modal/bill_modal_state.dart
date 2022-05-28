@@ -1,10 +1,21 @@
-class BillModalState {
-  final bool isNewBill;
+import 'package:blitter_flutter_app/data/models.dart';
 
-  BillModalState({required this.isNewBill});
+class BillModalState {
+  Bill? bill;
+  BillSubscriber? inTransactionBillSubscriber;
+
+  BillModalState({
+    this.bill,
+    this.inTransactionBillSubscriber,
+  });
 
   BillModalState copyWith({
-    bool? isNewBill,
+    Bill? bill,
+    BillSubscriber? inTransactionBillSubscriber,
   }) =>
-      BillModalState(isNewBill: isNewBill ?? this.isNewBill);
+      BillModalState(
+        bill: bill ?? this.bill,
+        inTransactionBillSubscriber:
+            inTransactionBillSubscriber ?? this.inTransactionBillSubscriber,
+      );
 }

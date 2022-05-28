@@ -4,6 +4,7 @@ class User {
   final String dateJoined;
   String? name;
   String? email;
+  String? upi;
   String? avatar;
   String? bio;
 
@@ -13,6 +14,7 @@ class User {
     required this.dateJoined,
     this.name,
     this.email,
+    this.upi,
     this.avatar,
     this.bio,
   });
@@ -23,6 +25,7 @@ class User {
         dateJoined = json['dateJoined'],
         name = json['name'],
         email = json['email'],
+        upi = json['upi'],
         avatar = json['avatar'],
         bio = json['bio'];
 
@@ -30,6 +33,7 @@ class User {
       : id = json['id'],
         name = json['name'],
         email = json['email'],
+        upi = json['upi'],
         avatar = json['avatar'],
         bio = json['bio'],
         phoneNumber = json['phone'],
@@ -41,6 +45,7 @@ class User {
         'dateJoined': dateJoined,
         'name': name,
         'email': email,
+        'upi': upi,
         'avatar': avatar,
         'bio': bio,
       };

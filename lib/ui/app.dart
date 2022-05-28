@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -6,6 +7,7 @@ import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
 import './ui.dart';
+import 'package:blitter_flutter_app/ui/payment/payment.dart';
 
 class BlitterApp extends StatelessWidget {
   const BlitterApp({Key? key}) : super(key: key);
@@ -54,13 +56,25 @@ class BlitterApp extends StatelessWidget {
             },
             DashboardScreen.route: (_) => const DashboardScreen(),
             BillManagerScreen.route: (ctx) {
-              return BlocProvider<BillManagerCubit>(
-                create: (_) => BillManagerCubit(
-                  apiRepository: context.read<APIRepository>(),
-                  apiSerializerRepository:
-                      context.read<APISerializerRepository>(),
-                  billBloc: context.read<BillBloc>(),
-                ),
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider<BillManagerCubit>(
+                    create: (_) => BillManagerCubit(
+                      apiRepository: context.read<APIRepository>(),
+                      apiSerializerRepository:
+                          context.read<APISerializerRepository>(),
+                      billBloc: context.read<BillBloc>(),
+                    ),
+                    lazy: false,
+                  ),
+                  BlocProvider(
+                    create: (_) => BillModalCubit(
+                      billBloc: context.read<BillBloc>(),
+                      apiRepository: context.read<APIRepository>(),
+                    ),
+                    lazy: false,
+                  )
+                ],
                 child: BlocBuilder<ConfigBloc, ConfigState>(
                   builder: (context, state) {
                     final themeData = Theme.of(ctx);
@@ -74,7 +88,30 @@ class BlitterApp extends StatelessWidget {
                   },
                 ),
               );
+              // BlocProvider<BillManagerCubit>(
+              //   create: (_) => BillManagerCubit(
+              //     apiRepository: context.read<APIRepository>(),
+              //     apiSerializerRepository:
+              //         context.read<APISerializerRepository>(),
+              //     billBloc: context.read<BillBloc>(),
+              //   ),
+              //   child: BlocBuilder<ConfigBloc, ConfigState>(
+              //     builder: (context, state) {
+              //       final themeData = Theme.of(ctx);
+              //       return Theme(
+              //         data: generateModuleThemeData(
+              //           defaultThemeData: themeData,
+              //           modulePrimaryColor: state.billPrimaryColor,
+              //         ),
+              //         child: const BillManagerScreen(),
+              //       );
+              //     },
+              //   ),
+              // );
             },
+            NewVpaScreen.route: (ctx) => const NewVpaScreen(),
+            PaymentScreen.route: (ctx) => const PaymentScreen(),
+            WaitingScreen.route: (ctx) => const WaitingScreen(),
           },
           debugShowCheckedModeBanner: false,
         );

@@ -31,6 +31,10 @@ class ApiURI {
     return _generateUri('bill-manager/bill/fetch/', params: params);
   }
 
+  static Uri fetchBill(int billId) {
+    return _generateUri('bill-manager/bill/$billId');
+  }
+
   static Uri fetchRequestedBills() {
     return _generateUri('bill-manager/bill/fetch-requested/');
   }
@@ -41,6 +45,10 @@ class ApiURI {
 
   static Uri updateBill(int id) {
     return _generateUri('bill-manager/bill/$id/');
+  }
+
+  static Uri createTransaction() {
+    return _generateUri('user/transaction/add/');
   }
 }
 
@@ -134,6 +142,15 @@ class APIRepository extends IAPIRepository {
   }
 
   @override
+  Future<http.Response> fetchBill(int id) async {
+    var response = await http.get(
+      ApiURI.fetchBill(id),
+      headers: _getAuthHeaders(),
+    );
+    return response;
+  }
+
+  @override
   Future<http.Response> fetchRequestedBills(JsonMap payload) async {
     var response = await http.post(
       ApiURI.fetchRequestedBills(),
@@ -157,6 +174,16 @@ class APIRepository extends IAPIRepository {
   Future<http.Response> updateBill(int id, JsonMap payload) async {
     var response = await http.patch(
       ApiURI.updateBill(id),
+      headers: _getHeaders(),
+      body: jsonEncode(payload),
+    );
+    return response;
+  }
+
+  @override
+  Future<http.Response> createTransaction(JsonMap payload) async {
+    var response = await http.post(
+      ApiURI.createTransaction(),
       headers: _getHeaders(),
       body: jsonEncode(payload),
     );

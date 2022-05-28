@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
+import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/models.dart';
+import 'package:blitter_flutter_app/ui/payment/payment.dart';
 import './bill_edit_toggle.dart';
 import './bill_type_badge.dart';
 import './bill_view_modal_subscribers.dart';
@@ -28,6 +30,8 @@ class BillViewModal extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final authBloc = context.read<AuthBloc>();
+    final contactBloc = context.read<ContactBloc>();
+    final billModalCubit = context.read<BillModalCubit>();
 
     final editToggleEnabled = hasEditPermission(
       context: context,
@@ -128,14 +132,39 @@ class BillViewModal extends StatelessWidget {
                     height: 45,
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (bill.subscribers[loggedInUserSubscriberIndex]
+                            .fulfilled) {
+                          return;
+                        }
+                        final receiver =
+                            contactBloc.getUserById(bill.createdBy)!;
+                        billModalCubit.inTransactionBillSubscriber =
+                            bill.subscribers[loggedInUserSubscriberIndex];
+                        Navigator.pushNamed(
+                          context,
+                          PaymentScreen.route,
+                          arguments: PaymentScreenArguments(
+                            bill: bill,
+                            amount: double.parse(bill
+                                    .subscribers[loggedInUserSubscriberIndex]
+                                    .amount) -
+                                double.parse(bill
+                                    .subscribers[loggedInUserSubscriberIndex]
+                                    .amountPaid),
+                            receiverName: receiver.name!,
+                            receiverPaymentAddress: receiver.upi!,
+                            billModalCubit: billModalCubit,
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         shape: const StadiumBorder(),
                       ),
                       child: Text(bill.subscribers[loggedInUserSubscriberIndex]
                               .fulfilled
                           ? 'Your settlement for this bill is complete'
-                          : 'Tap to pay your remaining ₹${double.parse(bill.subscribers[loggedInUserSubscriberIndex].amount) - double.parse(bill.subscribers[loggedInUserSubscriberIndex].amountPaid)}'),
+                          : 'Tap to settle your remaining ₹${double.parse(bill.subscribers[loggedInUserSubscriberIndex].amount) - double.parse(bill.subscribers[loggedInUserSubscriberIndex].amountPaid)}'),
                     ),
                   ),
                 ],

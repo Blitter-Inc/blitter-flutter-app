@@ -17,9 +17,13 @@ abstract class IAPIRepository {
     Map<String, dynamic>? params,
   });
 
+  Future<http.Response> fetchBill(int id);
+
   Future<http.Response> fetchRequestedBills(JsonMap payload);
 
   Future<http.Response> createBill(JsonMap payload);
 
   Future<http.Response> updateBill(int id, JsonMap payload);
+
+  Future<http.Response> createTransaction(JsonMap payload);
 }
