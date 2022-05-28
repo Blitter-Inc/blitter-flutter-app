@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:blitter_flutter_app/data/constants.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:blitter_flutter_app/config.dart' show apiBaseUrl;
 import 'package:blitter_flutter_app/data/blocs.dart' show AuthState;
+import 'package:blitter_flutter_app/data/constants.dart';
 import '../types.dart';
 import './abstract/api_repository.dart';
 
@@ -33,6 +33,14 @@ class ApiURI {
 
   static Uri createTransaction() {
     return _generateUri('user/transaction/add/');
+  }
+
+  static Uri fetchCounters() {
+    return _generateUri('user/fetch-counters/');
+  }
+
+  static Uri fetchTransactions() {
+    return _generateUri('user/transaction/');
   }
 
   static Uri fetchBills({Map<String, dynamic> params = const {}}) {
@@ -122,6 +130,24 @@ class APIRepository extends IAPIRepository {
     var response = await http.post(
       ApiURI.fetchUserProfiles(),
       body: jsonEncode(payload),
+      headers: _getHeaders(),
+    );
+    return response;
+  }
+
+  @override
+  Future<http.Response> fetchCounters() async {
+    var response = await http.get(
+      ApiURI.fetchCounters(),
+      headers: _getHeaders(),
+    );
+    return response;
+  }
+
+  @override
+  Future<http.Response> fetchTransactions() async {
+    var response = await http.get(
+      ApiURI.fetchTransactions(),
       headers: _getHeaders(),
     );
     return response;

@@ -66,6 +66,16 @@ class DashboardScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             OutlinedButton(
+              child: const Text('Transaction List Screen'),
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  TransactionListScreen.route,
+                );
+              },
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton(
               child: const Text('Reset App'),
               onPressed: context.resetApp,
             ),

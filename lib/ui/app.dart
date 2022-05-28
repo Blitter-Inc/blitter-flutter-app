@@ -88,30 +88,11 @@ class BlitterApp extends StatelessWidget {
                   },
                 ),
               );
-              // BlocProvider<BillManagerCubit>(
-              //   create: (_) => BillManagerCubit(
-              //     apiRepository: context.read<APIRepository>(),
-              //     apiSerializerRepository:
-              //         context.read<APISerializerRepository>(),
-              //     billBloc: context.read<BillBloc>(),
-              //   ),
-              //   child: BlocBuilder<ConfigBloc, ConfigState>(
-              //     builder: (context, state) {
-              //       final themeData = Theme.of(ctx);
-              //       return Theme(
-              //         data: generateModuleThemeData(
-              //           defaultThemeData: themeData,
-              //           modulePrimaryColor: state.billPrimaryColor,
-              //         ),
-              //         child: const BillManagerScreen(),
-              //       );
-              //     },
-              //   ),
-              // );
             },
             NewVpaScreen.route: (ctx) => const NewVpaScreen(),
             PaymentScreen.route: (ctx) => const PaymentScreen(),
             WaitingScreen.route: (ctx) => const WaitingScreen(),
+            TransactionListScreen.route: (ctx) => const TransactionListScreen(),
           },
           debugShowCheckedModeBanner: false,
         );

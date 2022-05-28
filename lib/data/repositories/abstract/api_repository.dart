@@ -11,6 +11,10 @@ abstract class IAPIRepository {
 
   Future<http.Response> fetchUserProfiles(JsonMap payload);
 
+  Future<http.Response> fetchCounters();
+
+  Future<http.Response> fetchTransactions();
+
   Future<http.Response> fetchBills({
     required String requestType,
     required String ordering,
