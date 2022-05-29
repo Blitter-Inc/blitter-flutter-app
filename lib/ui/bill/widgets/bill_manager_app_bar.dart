@@ -134,8 +134,7 @@ class _BillManagerAppBarState extends State<BillManagerAppBar> {
             child: state.searchBarEnabled ? searchBar : appBarTitle,
           ),
           actions: [
-            if (!(Platform.isAndroid || Platform.isIOS) &&
-                !state.searchBarEnabled)
+            if (!state.searchBarEnabled)
               IconButton(
                 onPressed: () =>
                     widget.refreshIndicatorKey.currentState!.show(),
