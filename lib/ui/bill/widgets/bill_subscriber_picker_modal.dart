@@ -35,8 +35,8 @@ class _BillSubscriberPickerModalState extends State<BillSubscriberPickerModal> {
     final contactList = contactBloc.state.objectMap!.values.toList();
     final authBloc = context.read<AuthBloc>();
     final billModalInput = widget.getBillModalInput();
-    final loggedInUserSubscriberIndex = billModalInput.subscribers.indexWhere(
-      (element) => element.user == authBloc.state.user!.id,
+    final loggedInUserSubscriberIndex = contactList.indexWhere(
+      (element) => element.id == authBloc.state.user!.id,
     );
 
     final Map<int, User> selectedSubscribers = {};
@@ -92,7 +92,7 @@ class _BillSubscriberPickerModalState extends State<BillSubscriberPickerModal> {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     final contact = contactList[
-                        index == loggedInUserSubscriberIndex
+                        index >= loggedInUserSubscriberIndex
                             ? index + 1
                             : index];
                     return SelectableItem(
