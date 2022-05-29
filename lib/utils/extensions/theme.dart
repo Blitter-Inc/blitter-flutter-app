@@ -36,4 +36,8 @@ extension CustomColorScheme on ColorScheme {
       _darkThemeEnabled ? Colors.grey : Colors.grey.shade800;
 
   Color get disabledChipText => _darkThemeEnabled ? Colors.white : Colors.black;
+
+  Color get dashboardCardBackground => _darkThemeEnabled
+      ? const Color.fromARGB(255, 14, 14, 14)
+      : const Color.fromRGBO(235, 235, 235, 1);
 }

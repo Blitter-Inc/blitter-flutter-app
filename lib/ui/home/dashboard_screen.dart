@@ -1,31 +1,56 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blitter_flutter_app/data/blocs.dart';
-import 'package:blitter_flutter_app/utils/extensions.dart';
+import 'package:blitter_flutter_app/data/models.dart';
+import 'package:blitter_flutter_app/data/repositories/api_repository.dart';
 import 'package:blitter_flutter_app/ui.dart';
+import 'package:blitter_flutter_app/utils/extensions.dart';
+import './widgets/widgets.dart';
 
 class DashboardScreen extends StatelessWidget {
   static const route = '/dashboard';
 
   const DashboardScreen({Key? key}) : super(key: key);
 
+  Future<DashboardCounters> _fetchCounters(
+    APIRepository apiRepository,
+  ) async {
+    final apiRes = await apiRepository.fetchCounters();
+    final apiResBody = jsonDecode(apiRes.body);
+    return DashboardCounters.fromApiJson(apiResBody);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final mediaQuery = MediaQuery.of(context);
+    final apiRepository = context.read<APIRepository>();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Dashboard',
+        title: Text(
+          'Activity Dashboard',
           style: TextStyle(
+            color: colorScheme.primary,
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
           IconButton(
-            onPressed: context.showColorPickerSheet,
-            icon: const Icon(Icons.color_lens),
+            color: colorScheme.primary,
+            icon: const Icon(Icons.refresh),
+            onPressed: context.resetApp,
           ),
           IconButton(
+            color: colorScheme.primary,
+            icon: const Icon(Icons.color_lens),
+            onPressed: context.showColorPickerSheet,
+          ),
+          IconButton(
+            color: colorScheme.primary,
             icon: BlocBuilder<ConfigBloc, ConfigState>(
               buildWhen: (previous, current) =>
                   previous.darkModeEnabled != current.darkModeEnabled,
@@ -39,47 +64,50 @@ class DashboardScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BlocBuilder<AuthBloc, AuthState>(
-              buildWhen: (previous, current) {
-                return previous.user?.name != current.user?.name;
-              },
-              builder: (context, state) {
-                return Text(
-                  'Welcome ${state.user?.name}\n\nPress the following buttons to test implemented functionalities of the app',
-                  textAlign: TextAlign.center,
-                );
-              },
-            ),
-            const SizedBox(height: 30),
-            OutlinedButton(
-              child: const Text('Bill Manager Screen'),
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  BillManagerScreen.route,
-                );
-              },
-            ),
-            const SizedBox(height: 10),
-            OutlinedButton(
-              child: const Text('Transaction List Screen'),
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  TransactionListScreen.route,
-                );
-              },
-            ),
-            const SizedBox(height: 10),
-            OutlinedButton(
-              child: const Text('Reset App'),
-              onPressed: context.resetApp,
-            ),
-          ],
+      body: Container(
+        height: mediaQuery.size.height,
+        width: mediaQuery.size.width,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 30,
+        ),
+        child: FutureBuilder<DashboardCounters>(
+          future: _fetchCounters(apiRepository),
+          builder: (context, snapshot) {
+            return Column(
+              children: [
+                const SizedBox(height: 20),
+                TotalBillCounter(snapshot: snapshot),
+                const SizedBox(height: 35),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      TransactionListScreen.route,
+                    );
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      TotalTransactionCounter(snapshot: snapshot),
+                      const SizedBox(height: 40),
+                      DebitTransactionRow(snapshot: snapshot),
+                      const SizedBox(height: 40),
+                      CreditTransactionRow(snapshot: snapshot),
+                      const SizedBox(height: 25),
+                      Text(
+                        'Transaction History > ',
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

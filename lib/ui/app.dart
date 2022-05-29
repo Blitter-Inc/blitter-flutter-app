@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -7,7 +6,6 @@ import 'package:blitter_flutter_app/data/blocs.dart';
 import 'package:blitter_flutter_app/data/cubits.dart';
 import 'package:blitter_flutter_app/data/repositories.dart';
 import './ui.dart';
-import 'package:blitter_flutter_app/ui/payment/payment.dart';
 
 class BlitterApp extends StatelessWidget {
   const BlitterApp({Key? key}) : super(key: key);
